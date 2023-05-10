@@ -1,0 +1,211 @@
+// ==UserScript==
+// @name         炸号微博备份
+// @namespace    https://dun.mianbaoduo.com/@fun
+// @version      0.7
+// @description  炸号微博一键备份
+// @author       fun
+// @match        *://weibo.com/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=weibo.com
+// @grant        none
+// @license      GPL
+// ==/UserScript==
+
+(function () {
+  "use strict";
+
+  let wrapper = document.createElement("div");
+
+  let backup = document.createElement("div");
+
+  backup.innerHTML = `<div><svg id="bIndicator" style="vertical-align: -12px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" class="woo-spinner-main Scroll_loadingIcon_2nyZ4"><g fill="none" stroke-width="5" stroke-miterlimit="10" stroke="currentColor" style="animation: 2s linear 0s infinite normal none running woo-spinner-_-rotate; height: 50px; transform-origin: center center; width: 50px;"><circle cx="25" cy="25" r="20" opacity=".3"></circle><circle cx="25" cy="25" r="20" stroke-dasharray="25,200" stroke-linecap="round" style="animation: 1.5s ease-in-out 0s infinite normal none running woo-spinner-_-dash;"></circle></g></svg><span id="bMSG"></span></div>
+
+<div style="text-align: center;"><a href="https://dun.mianbaoduo.com/@fun" target="_blank" style="border-radius: 0.166667rem; display: inline-block; font-weight: bold; color: #ca3a1f; margin-left: 0px; padding: 3px 14px;font-size: 13px;text-align: center;border: 1px solid #cfcfcf;margin-top: 8px;">打赏<span style="font-size: 16px; vertical-align: -2px; margin-left: 5px;">😋</span></a></div>  `;
+
+  function download(content, fileName, contentType) {
+    var a = document.createElement("a");
+    var file = new Blob([content], { type: contentType });
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+  }
+  //   download(jsonData, "json.txt", "text/plain");
+  async function fetchContent(uid = 0, page = 1, type = "my") {
+    let api = `https://weibo.com/ajax/statuses/mymblog?uid=${uid}&page=${page}&feature=0`;
+
+    if (type === "fav") {
+      api = `https://weibo.com/ajax/favorites/all_fav?uid=${uid}&page=${page}`;
+    }
+
+    if (type === "like") {
+      api = `https://weibo.com/ajax/statuses/likelist?uid=${uid}&page=${page}`;
+    }
+
+    const req = await fetch(api, {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        "accept-language": "zh-CN,zh;q=0.9,en-IN;q=0.8,en;q=0.7,ar;q=0.6",
+        "sec-ch-ua":
+          '" Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"macOS"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+        "x-requested-with": "XMLHttpRequest",
+      },
+      referrer: `https://weibo.com/u/${uid}`,
+      referrerPolicy: "strict-origin-when-cross-origin",
+      body: null,
+      method: "GET",
+      mode: "cors",
+      credentials: "include",
+    });
+    const data = await req.json();
+    return data;
+  }
+
+  async function fetchAll(type = "my") {
+    var uid = $CONFIG.uid;
+    let page = 1;
+    let allPageData = [];
+    let noMore = false;
+    for (let index = 0; index < Infinity; index++) {
+      console.log("scan", "page", page);
+      printLog(`正在备份第 ${page} 页`);
+      for (let index = 0; index < 10; index++) {
+        const pageData = await fetchContent(uid, page, type);
+        if (pageData.ok) {
+          const dataList = type === "fav" ? pageData.data : pageData.data.list;
+          allPageData.push(dataList);
+          if (dataList.length === 0) noMore = true;
+          break;
+        }
+        await new Promise((resolve) => {
+          setTimeout(resolve, 8 * 1000);
+        });
+        console.log("retry", index);
+        printLog(
+          `[重试]备份第 ${page} 页，错误内容： ${JSON.stringify(pageData)}`
+        );
+      }
+      page++;
+      if (noMore) break;
+      await new Promise((resolve) => {
+        setTimeout(resolve, 5 * 1000);
+      });
+    }
+    console.log("all done");
+    printLog(`备份完毕! 打开【下载内容】查看数据文件`);
+    const parsed = allPageData.reduce((all, dataList) => {
+      dataList.forEach((c) => {
+        const formatted = {
+          images:
+            c.pic_ids &&
+            c.pic_ids.map((d) => {
+              return c.pic_infos[d].large.url;
+            }),
+          text: c.text,
+          created_at: c.created_at,
+          raw: c,
+        };
+        if (c.retweeted_status) {
+          formatted.retweeted_status = {
+            text: c.retweeted_status.text,
+            images:
+              c.retweeted_status.pic_ids &&
+              c.retweeted_status.pic_ids.map((d) => {
+                return c.retweeted_status.pic_infos[d].large.url;
+              }),
+          };
+        }
+        all.push(formatted);
+      });
+      return all;
+    }, []);
+    console.log("data", allPageData, parsed);
+    download(
+      JSON.stringify(parsed, null, 2),
+      "weibo-" + Date.now() + "-" + type + ".json",
+      "text/plain"
+    );
+  }
+
+  function printLog(msg) {
+    tip.innerText = msg;
+  }
+
+  backup.setAttribute(
+    "style",
+    "display:none; background: white; color: black; font-size: 13px; padding: 10px 10px 15px 10px;"
+  );
+
+  //   backup.appendChild(tip);
+  const title = document.createElement("h2");
+  title.innerHTML = "微博备份";
+
+  title.setAttribute("style", "font-size: 15px;color: black;margin: 15px 0;");
+  wrapper.appendChild(title);
+  wrapper.appendChild(backup);
+
+  document.body.appendChild(wrapper);
+  wrapper.setAttribute(
+    "style",
+    `position: fixed;
+    border-radius: 3px;
+    background: white;
+    top: 80px;
+    right: 20px;
+    z-index: 100000;
+    padding:10px 15px;
+text-align: center; 
+   `
+  );
+
+  let started = false;
+
+  let allButtons = [];
+  function showAll() {
+    allButtons.forEach((btn) => {
+      btn.style.display = "block";
+    });
+  }
+
+  function hideAll() {
+    allButtons.forEach((btn) => {
+      btn.style.display = "none";
+    });
+  }
+
+  function createExport(name, type) {
+    let btn = document.createElement("button");
+    wrapper.appendChild(btn);
+    btn.innerHTML = name;
+    btn.setAttribute(
+      "style",
+      `border-radius: 0.166667rem; display: block; font-weight: bold; color: #444; margin:0 auto; padding: 5px 14px;font-size: 13px;text-align: center;border: 1px solid #cfcfcf;margin-top: 3px; cursor: pointer;  margin-bottom: 7px;`
+    );
+    btn.addEventListener("click", async () => {
+      if (started) {
+        alert("started");
+        return;
+      }
+      started = true;
+      hideAll();
+      backup.style.display = "block";
+      indicator.style.display = "inline-block";
+      console.log("fetchAll", type);
+      await fetchAll(type);
+      started = false;
+      showAll();
+      indicator.style.display = "none";
+    });
+
+    allButtons.push(btn);
+  }
+  let tip = document.getElementById("bMSG");
+  let indicator = document.getElementById("bIndicator");
+
+  createExport("备份我的微博", "my");
+  createExport("备份我的收藏", "fav");
+  createExport("备份我的赞", "like");
+})();

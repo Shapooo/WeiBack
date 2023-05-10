@@ -1,0 +1,66 @@
+.bkBox {
+    position: fixed;
+    border-radius: 3px;
+    background: white;
+    top: 80px;
+    right: 20px;
+    z-index: 100000;
+    padding: 10px 15px;
+    text-align: center;
+    border: 2px solid black
+}
+
+.bkBox-title {
+    font-size: 15px;
+    color: black;
+    margin: 0 0;
+}
+
+.bkBox-button {
+    border-radius: 0.166667rem;
+    display: block;
+    font-weight: bold;
+    color: #444;
+    margin: 0 auto;
+    padding: 5px 14px;
+    font-size: 13px;
+    text-align: center;
+    border: 1px solid #cfcfcf;
+    margin-top: 3px;
+    cursor: pointer;
+    margin-bottom: 7px;
+}
+
+.nav {
+    display: flex;
+    width: 300px;
+    height: 20px;
+    background-color: aqua;
+    margin: auto;
+}
+
+.box {
+    width: 300px;
+    /* 超出部分隐藏 */
+    overflow: hidden;
+    margin: auto;
+    display: flex;
+}
+
+.content {
+    width: 300px;
+    height: 200px;
+    flex-shrink: 0;
+}
+
+#content1 {
+    background-color: paleturquoise;
+}
+
+#content2 {
+    background-color: yellowgreen;
+}
+
+#content3 {
+    background-color: peru;
+}
