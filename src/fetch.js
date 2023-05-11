@@ -17,7 +17,7 @@ async function fetchContent(uid = 0, page = 1, type = "myblog") {
     console.log(`request ${api}`);
     const req = await fetch(api, {
         headers: {
-            accept: "application/json, text/plain, */*",
+            "accept": "application/json, text/plain, */*",
             "accept-language": "zh-CN,zh;q=0.9,en-IN;q=0.8,en;q=0.7,ar;q=0.6",
             "sec-ch-ua":
                 '" Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"',
@@ -70,38 +70,9 @@ async function fetchAll(type = "myblog", range) {
             setTimeout(resolve, 5 * 1000);
         });
     }
-    console.log("data fetched, start to process")
-    // printLog(`备份完毕! 打开【下载内容】查看数据文件`);
-    const parsed = allPageData.reduce((all, dataList) => {
-        dataList.forEach((c) => {
-            const formatted = {
-                images:
-                    c.pic_ids &&
-                    c.pic_ids.map((d) => {
-                        return c.pic_infos[d].large.url;
-                    }),
-                text: c.text,
-                created_at: c.created_at,
-                raw: c,
-            };
-            if (c.retweeted_status) {
-                formatted.retweeted_status = {
-                    text: c.retweeted_status.text,
-                    images:
-                        c.retweeted_status.pic_ids &&
-                        c.retweeted_status.pic_ids.map((d) => {
-                            return c.retweeted_status.pic_infos[d].large.url;
-                        }),
-                };
-            }
-            all.push(formatted);
-        });
-        return all;
-    }, []);
-    // console.log("data", allPageData, parsed);
-    console.log("data processed, saving to disk")
+    let rawData = allPageData.flat();
     download(
-        JSON.stringify(parsed, null, 2),
+        JSON.stringify(rawData, null, 2),
         "weibo-" + Date.now() + "-" + type + ".json",
         "text/plain"
     );

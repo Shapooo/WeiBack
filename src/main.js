@@ -89,5 +89,5 @@ async function getPageAmount(type) {
     } else {
         amount = Infinity;
     }
-    return amount;
+    return Math.ceil(amount / 20);
 }
