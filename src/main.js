@@ -1,103 +1,4 @@
-let bkBoxStyle = `.bkBox {
-    position: fixed;
-    border-radius: 5px;
-    background: #fff;
-    top: 80px;
-    right: 20px;
-    z-index: 100000;
-    padding: 10px 15px;
-    text-align: center;
-    border: 1px solid #a7a6a6
-}
-
-.bkBox-title {
-    font-size: 20px;
-    color: #ff8200;
-    margin: 8px 0;
-    font-weight: 400;
-    border: 1px solid transparent;
-    border-bottom-color: #a7a6a6
-}
-
-.bkBox-button {
-    border-radius: 2.25rem;
-    display: block;
-    background: #ffd3a3;
-    padding: 5px 8px;
-    color: #fff;
-    text-align: center;
-    cursor: pointer;
-    margin: 16px auto 7px;
-    border: 0;
-    font: white
-}
-
-.bkBox-button:hover {
-    background: #ff8200;
-}
-
-.box,
-.nav {
-    width: 300px;
-    margin: auto;
-    display: flex
-}
-
-.nav {
-    height: 30px;
-    background-color: #fff;
-    border: 1px gray
-}
-
-.box {
-    overflow: hidden
-}
-
-.bk-naviItem {
-    color: #000;
-    height: 30px;
-    width: 100px;
-    margin: auto;
-    border: 8px #000;
-    float: left
-}
-
-.bk-naviItem,
-.bk-naviItem:hover {
-    text-decoration: none;
-}
-
-.bk-navi-inner {
-    border-radius: 8px;
-    height:30px;
-}
-
-.bk-navi-inner:hover {
-    background-color: #f2f0ef;
-}
-.bk-pageNumIndicator {
-    margin:16px
-}
-
-.bk-settingPage {
-    border-radius: 5px;
-    width: 300px;
-    height: 150px;
-    background-color: #f2f0ef;
-    flex-shrink: 0
-}
-
-.bk-input {
-    border-radius: 1em;
-    border: 2px solid #ffd3a3;
-    height: 20px;
-    width: 50px;
-    text-align: center
-}
-
-.bk-input:hover {
-    border: 2px solid #ff8200;
-}`;
+let bkBoxStyle = `.bkBox{position:fixed;border-radius:5px;background:#fff;top:80px;right:20px;z-index:100000;padding:10px 15px;text-align:center;border:1px solid #a7a6a6}.bkBox-title{font-size:20px;color:#ff8200;margin:8px 0;font-weight:400;border:1px solid transparent;border-bottom-color:#a7a6a6}.bkBox-button{border-radius:2.25rem;display:block;background:#ffd3a3;padding:5px 8px;color:#fff;text-align:center;cursor:pointer;margin:16px auto 7px;border:0;font:white}.bkBox-button:hover{background:#ff8200}.box,.nav{width:300px;margin:auto;display:flex}.nav{height:30px;background-color:#fff;border:1px gray}.box{overflow:hidden}.bk-naviItem{color:#000;height:30px;width:100px;margin:auto;border:8px #000;float:left}.bk-naviItem,.bk-naviItem:hover{text-decoration:none}.bk-navi-inner{border-radius:8px;height:30px}.bk-navi-inner:hover{background-color:#f2f0ef}.bk-pageNumIndicator{margin:16px}.bk-settingPage{border-radius:5px;width:300px;height:150px;background-color:#f2f0ef;flex-shrink:0}.bk-input{border-radius:1em;border:2px solid #ffd3a3;height:20px;width:50px;text-align:center}.bk-input:hover{border:2px solid #ff8200}.bkBox-tip{height:100px;width:300px;display:flex;align-items:center;justify-content:center}`;
 
 const SETTINGS_TEMP = `<div class="bk-pageNumIndicator"></div><div>下载 <input type="number" value="1" min="1" max="22" class="bk-input"> 至 <input type="number" value="22" min="1" max="22" class="bk-input"> 页</div><div><button class="bkBox-button">开始下载</button></div>`;
 
@@ -118,16 +19,20 @@ const TT = (type, name) => {
     })();
 }
 
+let bkBox = document.createElement("div");
+bkBox.className = "bkBox";
+bkBox.innerHTML = BKBOX_TEMP;
+
+let bkBoxStyleSheet = document.createElement("style");
+bkBoxStyleSheet.innerText = bkBoxStyle;
+bkBox.appendChild(bkBoxStyleSheet);
+
+let bkBoxTip = document.createElement("div");
+bkBoxTip.className = 'bkBox-tip';
+bkBox.appendChild(bkBoxTip);
+
 let bkTypes = [TT('fav', '我的收藏'), TT('like', '我的点赞'), TT('myblog', '我的发布')];
 Promise.all(bkTypes).then((values) => {
-    let bkBox = document.createElement("div");
-    bkBox.className = "bkBox";
-    bkBox.innerHTML = BKBOX_TEMP;
-
-    let bkBoxStyleSheet = document.createElement("style");
-    bkBoxStyleSheet.innerText = bkBoxStyle;
-    bkBox.appendChild(bkBoxStyleSheet);
-
     values.map((t) => {
         return {
             type: t.type, name: t.name, settingsPage: (() => {
@@ -162,26 +67,23 @@ Promise.all(bkTypes).then((values) => {
         console.log(`settled post type ${c.type} to bkBox`);
     })
     document.body.appendChild(bkBox);
-
-    // =========================================================
-
-    function settleDownBkTypes(type, name, settingsPage) {
-        let nav = bkBox.getElementsByClassName("navi")[0];
-        let settingBox = bkBox.getElementsByClassName("box")[0];
-        let naviButton = document.createElement("a");
-        naviButton.innerHTML = "<div class='bk-navi-inner'>" + name + "</div>";
-        naviButton.className = "bk-naviItem"
-        naviButton.href = "#" + type;
-        nav.appendChild(naviButton);
-        let page = document.createElement("div");
-        page.id = type;
-        page.className = "bk-settingPage"
-        page.appendChild(settingsPage);
-        settingBox.appendChild(page);
-        nav.append
-    }
-
 })
+
+function settleDownBkTypes(type, name, settingsPage) {
+    let nav = bkBox.getElementsByClassName("navi")[0];
+    let settingBox = bkBox.getElementsByClassName("box")[0];
+    let naviButton = document.createElement("a");
+    naviButton.innerHTML = "<div class='bk-navi-inner'>" + name + "</div>";
+    naviButton.className = "bk-naviItem"
+    naviButton.href = "#" + type;
+    nav.appendChild(naviButton);
+    let page = document.createElement("div");
+    page.id = type;
+    page.className = "bk-settingPage"
+    page.appendChild(settingsPage);
+    settingBox.appendChild(page);
+    nav.append
+}
 
 async function getPageAmount(type) {
     let data = (await fetchMyContent(1, type)).data;
@@ -194,4 +96,8 @@ async function getPageAmount(type) {
         amount = Infinity;
     }
     return Math.ceil(amount / 20);
+}
+
+function showTip(msg) {
+    bkBoxTip.innerHTML = msg;
 }

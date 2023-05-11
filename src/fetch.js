@@ -47,7 +47,7 @@ async function fetchAll(type = "myblog", range) {
     let noMore = false;
     for (let index = range[0]; index <= range[1]; index++) {
         console.log("scan", "page", page);
-        // printLog(`正在备份第 ${page} 页`);
+        showTip(`正在备份第 ${page} 页<br>因微博速率限制，过程可能较长，先干点别的吧`);
         for (let index = 0; index < 10; index++) {
             const pageData = await fetchContent(uid, page, type);
             if (pageData.ok) {
@@ -60,9 +60,9 @@ async function fetchAll(type = "myblog", range) {
                 setTimeout(resolve, 8 * 1000);
             });
             console.log("retry", index);
-            // printLog(
-            //     `[重试]备份第 ${page} 页，错误内容： ${JSON.stringify(pageData)}`
-            // );
+            showTip(
+                `[重试]备份第 ${page} 页，错误内容： ${JSON.stringify(pageData)}`
+            );
         }
         page++;
         if (noMore) break;
@@ -70,6 +70,7 @@ async function fetchAll(type = "myblog", range) {
             setTimeout(resolve, 5 * 1000);
         });
     }
+    showTip(`数据拉取完成，等待下载到本地`);
     let rawData = allPageData.flat();
     download(
         JSON.stringify(rawData, null, 2),
@@ -77,4 +78,5 @@ async function fetchAll(type = "myblog", range) {
         "text/plain"
     );
     console.log("all done");
+    showTip(`完成，可以进行其它操作`);
 }
