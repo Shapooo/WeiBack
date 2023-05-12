@@ -86,14 +86,15 @@ function settleDownBkTypes(type, name, settingsPage) {
 }
 
 async function getPageAmount(type) {
+    if (type == 'like') {
+        return Infinity;
+    }
     let data = (await fetchMyContent(1, type)).data;
     let amount = 0;
     if (type == 'fav') {
         amount = data.total_number;
-    } else if (type == 'myblog') {
-        amount = data.total;
     } else {
-        amount = Infinity;
+        amount = data.total;
     }
     return Math.ceil(amount / 20);
 }

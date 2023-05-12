@@ -5,4 +5,3 @@ function download(content, fileName, contentType) {
     a.download = fileName;
     a.click();
 }
-//   download(jsonData, "json.txt", "text/plain");
