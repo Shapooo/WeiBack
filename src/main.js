@@ -57,7 +57,9 @@ Promise.all(bkTypes).then((values) => {
                 btn.addEventListener("click", async () => {
                     let dlRange_ = page.querySelectorAll("input");
                     let dlRange = [dlRange_[0].value, dlRange_[1].value];
+                    hideAllButton();
                     await fetchAll(type, dlRange);
+                    showAllButton();
                 })
                 return page;
             })()
@@ -68,6 +70,19 @@ Promise.all(bkTypes).then((values) => {
     })
     document.body.appendChild(bkBox);
 })
+
+function hideAllButton() {
+    let buttons = document.getElementsByClassName('bkBox-button');
+    buttons.forEach(btn => {
+        btn.style.display = 'none';
+    })
+}
+function showAllButton() {
+    let buttons = document.getElementsByClassName('bkBox-button');
+    buttons.forEach(btn => {
+        btn.style.display = 'block';
+    })
+}
 
 function settleDownBkTypes(type, name, settingsPage) {
     let nav = bkBox.getElementsByClassName("navi")[0];
