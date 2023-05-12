@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         微博备份
 // @namespace    https://github.com/Shapooo/
-// @version      0.0
+// @version      0.1
 // @description  微博数据下载备份
 // @author       Shapooo
 // @match        *://weibo.com/*
