@@ -1,9 +1,9 @@
 async function fetchMyContent(page = 1, type = "myblog") {
     let uid = globalConfig.uid;
-    return await fetchContent(uid, page, type);
+    return await fetchPostMeta(uid, page, type);
 }
 
-async function fetchContent(uid = 0, page = 1, type = "myblog") {
+async function fetchPostMeta(uid = 0, page = 1, type = "myblog") {
     let api = `https://weibo.com/ajax/statuses/mymblog?uid=${uid}&page=${page}&feature=0&with_total=true`;
 
     if (type === "fav") {
@@ -20,7 +20,7 @@ async function fetchContent(uid = 0, page = 1, type = "myblog") {
     return data;
 }
 
-async function fetchAll(type = "myblog", range) {
+async function fetchAllPostMetas(type = "myblog", range) {
     console.log(`fetching ${type} post ${range}`)
     let uid = globalConfig.uid;
     let page = 1;
@@ -30,7 +30,7 @@ async function fetchAll(type = "myblog", range) {
         console.log("scan", "page", page);
         showTip(`正在备份第 ${page} 页<br>因微博速率限制，过程可能较长，先干点别的吧`);
         for (let index = 0; index < 10; index++) {
-            const pageData = await fetchContent(uid, page, type);
+            const pageData = await fetchPostMeta(uid, page, type);
             if (pageData.ok) {
                 const dataList = type === "fav" ? pageData.data.status : pageData.data.list;
                 allPageData.push(dataList);
@@ -53,11 +53,13 @@ async function fetchAll(type = "myblog", range) {
     }
     showTip(`数据拉取完成，等待下载到本地`);
     let rawData = allPageData.flat();
-    download(
-        JSON.stringify(rawData, null, 2),
-        "weibo-" + Date.now() + "-" + type + ".json",
-        "text/plain"
-    );
+
+    download(await generateHtml(rawData), `weiback-${Date.now()}-${type}.html`, "text/plain");
+    // download(
+    //     JSON.stringify(rawData, null, 2),
+    //     "weibo-" + Date.now() + "-" + type + ".json",
+    //     "text/plain"
+    // );
     console.log("all done");
     showTip(`完成，可以进行其它操作`);
 }

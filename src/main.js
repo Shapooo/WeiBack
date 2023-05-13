@@ -80,7 +80,7 @@ Promise.all(bkTypes).then((values) => {
                     let dlRange_ = page.querySelectorAll("input");
                     let dlRange = [dlRange_[0].value, dlRange_[1].value];
                     hideAllButton();
-                    await fetchAll(type, dlRange);
+                    await fetchAllPostMetas(type, dlRange);
                     showAllButton();
                 })
                 return page;
