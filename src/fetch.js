@@ -15,26 +15,7 @@ async function fetchContent(uid = 0, page = 1, type = "myblog") {
     }
 
     console.log(`request ${api}`);
-    const req = await fetch(api, {
-        headers: {
-            "accept": "application/json, text/plain, */*",
-            "accept-language": "zh-CN,zh;q=0.9,en-IN;q=0.8,en;q=0.7,ar;q=0.6",
-            "sec-ch-ua":
-                '" Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"',
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": '"macOS"',
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-origin",
-            "x-requested-with": "XMLHttpRequest",
-        },
-        referrer: `https://weibo.com/u/${uid}`,
-        referrerPolicy: "strict-origin-when-cross-origin",
-        body: null,
-        method: "GET",
-        mode: "cors",
-        credentials: "include",
-    });
+    const req = await fetch(api, globalConfig.httpInit());
     const data = await req.json();
     return data;
 }
