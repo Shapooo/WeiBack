@@ -1,65 +1,84 @@
 body {
-    background-color: #f1f2f5;
+    background-color: #f1f2f5
 }
 
 .bk-post-wrapper {
-    border-radius: 10px;
+    border-radius: 4px;
     background: #fff;
     width: 700px;
     margin: 8px auto;
-    padding: 10px 0px;
+    padding: 10px 0
 }
 
 .bk-poster {
     display: flex;
     align-items: center;
     vertical-align: middle;
-    height: 60px;
+    height: 60px
 }
 
 .bk-poster-avatar {
     height: 60px;
     width: 60px;
     border-radius: 50%;
-    margin: auto 8px;
+    margin: auto 8px
 }
 
 .bk-post-text {
-    background: white;
+    background: #fff
 }
-
 
 .bk-content {
     margin: 8px 24px 8px 76px;
+    font-size: 15px;
+    line-height: 24px
 }
 
-.bk-retweet-poster {
+.bk-retweeter {
     margin: 8px 24px 8px 76px;
-    vertical-align: middle;
+    vertical-align: middle
 }
 
 .bk-retweet {
     background: #f9f9f9;
+    padding: 2px auto
 }
 
 .bk-pic {
     max-width: 600px;
     max-height: 400px;
-    margin: auto 24px auto 76px;
+    margin: auto
 }
 
-.bk-video {
-    width: 600px;
-}
-
-.bk-retweet-poster-name,
-.bk-poster-name {
-    color: black;
-    font-weight: bold;
+.bk-poster-name,
+.bk-retweeter-name {
+    color: #000;
+    font-weight: 700;
     text-decoration: none;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Arial, Helvetica, sans-serif
 }
 
-.bk-retweet-poster-name {
-    margin: 8px 24px 8px 76px;
+.bk-poster-name:hover,
+.bk-retweeter-name:hover {
+    color: #eb7350
+}
+
+.bk-icon-link {
+    height: 12px;
+    filter: sepia(100%) saturate(3800%) contrast(75%)
+}
+
+.bk-link,
+.bk-user {
+    color: #eb7350;
+    text-decoration: none
+}
+
+.bk-link:hover,
+.bk-user:hover {
+    text-decoration: underline
+}
+
+.bk-emoji {
+    height: 20px
 }
