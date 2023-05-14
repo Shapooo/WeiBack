@@ -63,7 +63,10 @@ async function fetchAllPosts(type = "myblog", range, outFormat = "html") {
         let taskName = "WeiBack-" + Date.now();
         let zip = await generateHtml(metaData, taskName);
         zip.generateAsync({ type: "blob" }).then(function (content) {
+            console.log(content);
             saveAs(content, taskName + '.zip');
+        }).catch((err) => {
+            console.error(err);
         });
     } else {
         let jsonStr = JSON.stringify(rawData, null, 2);

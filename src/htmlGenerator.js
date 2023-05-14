@@ -1,25 +1,130 @@
-const HTML_GEN_TEMP = `<html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{background-color:#f1f2f5}.bk-post-wrapper{border-radius:4px;background:#fff;width:700px;margin:8px auto;padding:10px 0}.bk-poster{display:flex;align-items:center;vertical-align:middle;height:60px}.bk-poster-avatar{height:60px;width:60px;border-radius:50%;margin:auto 8px}.bk-post-text{background:#fff}.bk-content{margin:8px 24px 8px 76px;font-size:15px;line-height:24px}.bk-retweet-poster{margin:8px 24px 8px 76px;vertical-align:middle}.bk-retweet{background:#f9f9f9;padding:2px auto}.bk-pic{max-width:600px;max-height:400px;margin:auto 24px auto 76px}.bk-video{width:600px}.bk-poster-name,.bk-retweet-poster-name{color:#000;font-weight:700;text-decoration:none;font-family:Arial,Helvetica,sans-serif}.bk-poster-name:hover,.bk-retweet-poster-name:hover{color:#eb7350}.bk-retweet-poster-name{margin:8px 24px 8px 76px}.bk-icon-link{height:12px;filter:sepia(100%) saturate(3800%) contrast(75%)}.bk-link,.bk-user{color:#eb7350;text-decoration:none}.bk-link:hover,.bk-user:hover{text-decoration:underline}</style><title>微博备份</title></head><body><div class="bk-post-wrapper"><div class="bk-poster"><img class="bk-poster-avatar" alt="weibo poster"> <a class="bk-poster-name"></a></div><div class="bk-post"><div class="bk-post-text bk-content"></div><div class="bk-post-media bk-content"></div></div><div class="bk-retweet"><a class="bk-retweet-poster-name"></a><div class="bk-retweet-text bk-content"></div><div class="bk-retweet-media bk-content"></div></div></div></body></html>`;
+const HTML_GEN_TEMP = `<html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
+
+body {
+    background-color: #f1f2f5
+}
+
+.bk-post-wrapper {
+    border-radius: 4px;
+    background: #fff;
+    width: 700px;
+    margin: 8px auto;
+    padding: 10px 0
+}
+
+.bk-poster {
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    height: 60px
+}
+
+.bk-poster-avatar {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    margin: auto 8px
+}
+
+.bk-post-text {
+    background: #fff
+}
+
+.bk-content {
+    margin: 8px 24px 8px 76px;
+    font-size: 15px;
+    line-height: 24px
+}
+
+.bk-retweet-poster {
+    margin: 8px 24px 8px 76px;
+    vertical-align: middle
+}
+
+.bk-retweet {
+    background: #f9f9f9;
+    padding: 2px auto
+}
+
+.bk-pic {
+    max-width: 600px;
+    max-height: 400px;
+    margin: auto 24px auto 76px
+}
+
+.bk-video {
+    width: 600px
+}
+
+.bk-poster-name,
+.bk-retweet-poster-name {
+    color: #000;
+    font-weight: 700;
+    text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif
+}
+
+.bk-poster-name:hover,
+.bk-retweet-poster-name:hover {
+    color: #eb7350
+}
+
+.bk-retweet-poster-name {
+    margin: 8px 24px 8px 76px
+}
+
+.bk-icon-link {
+    height: 12px;
+    filter: sepia(100%) saturate(3800%) contrast(75%)
+}
+
+.bk-link,
+.bk-user {
+    color: #eb7350;
+    text-decoration: none
+}
+
+.bk-link:hover,
+.bk-user:hover {
+    text-decoration: underline
+}
+
+.bk-emoji {
+    height: 20px;
+}
+
+</style><title>微博备份</title></head><body><div class="bk-post-wrapper"><div class="bk-poster"><img class="bk-poster-avatar" alt="weibo poster"> <a class="bk-poster-name"></a></div><div class="bk-post"><div class="bk-post-text bk-content"></div><div class="bk-post-media bk-content"></div></div><div class="bk-retweet"><a class="bk-retweet-poster-name"></a><div class="bk-retweet-text bk-content"></div><div class="bk-retweet-media bk-content"></div></div></div></body></html>`;
 const POST_GEN_TEMP = `<div class="bk-post-wrapper"><div class="bk-poster"><img class="bk-poster-avatar" alt="weibo poster"> <a class="bk-poster-name"></a></div><div class="bk-post"><div class="bk-post-text bk-content"></div></div></div>`;
 const RETWEET_TEMP = `<div class="bk-retweet"><a class="bk-retweet-poster-name"></a><div class="bk-retweet-text bk-content"></div></div>`;
 
 async function generateHtml(posts, name) {
+    await fetchEmoticon();
     globalConfig.taskName = name;
-    await dataInit();
-    let cache = new Map();
-    let inner = (await Promise.all(posts.map((post) => generateOnePost(post, cache)))).join('');
+    let storage = {
+        cache: new Map(),
+        taskName: name,
+    }
+    let inner = (await Promise.all(posts.map((post) => generateOnePost(post, storage)))).join('');
     let doc = (new DOMParser).parseFromString(HTML_GEN_TEMP, 'text/html');
     doc.body.innerHTML = inner;
     const zip = new JSZip();
     zip.file(name + '.html', doc.documentElement.outerHTML);
     const resources = zip.folder(name + '_files');
+    await Promise.all(Array.from(storage.cache).map((kv) => {
+        return fetchPic(kv[0]).then((blob) => {
+            resources.file(kv[1], blob, { binary: true });
+        });
+    }));
+    resources.file("test.txt", "helloworld");
     return zip;
 }
 
-async function dataInit() {
-    await fetchEmoticon();
+async function fetchPic(url) {
+    let res = await fetch(url, globalConfig.httpInit);
+    return (await res.blob());
 }
 
-async function generateOnePost(post, cache) {
+async function generateOnePost(post, storage) {
     // try {
     let tempContainerDiv = document.createElement('div');
     tempContainerDiv.innerHTML = POST_GEN_TEMP;
@@ -28,7 +133,7 @@ async function generateOnePost(post, cache) {
     let poster_name = tempContainerDiv.querySelector('.bk-poster-name');
     let post_text = tempContainerDiv.querySelector('.bk-post-text');
     poster_avatar.src = post.user.profile_image_url;
-    let a = await parsePost(post, cache);
+    let a = await parsePost(post, storage);
     // console.log(a);
     poster_name.innerHTML = a.poster_name;
     poster_name.href = a.poster_url;
@@ -45,7 +150,7 @@ async function generateOnePost(post, cache) {
         retweet_div.innerHTML = RETWEET_TEMP;
         let retweeter_name = retweet_div.querySelector('.bk-retweet-poster-name');
         let retweet_text = retweet_div.querySelector('.bk-retweet-text');
-        let a = await parsePost(post.retweeted_status, cache);
+        let a = await parsePost(post.retweeted_status, storage);
         // console.log(a);
         retweeter_name.innerHTML = a.poster_name;
         retweeter_name.href = a.poster_url;
@@ -65,10 +170,10 @@ async function generateOnePost(post, cache) {
     // }
 }
 
-async function parsePost(post, cache) {
+async function parsePost(post, storage) {
     // try {
     let text = await transText(post.isLongText ? await fetchLongText(post.mblogid) : post.text_raw,
-        post.topic_struct, post.url_struct, cache);
+        post.topic_struct, post.url_struct, storage);
     // console.log(text);
     let pics = [];
     let video = {};
@@ -89,12 +194,7 @@ async function parsePost(post, cache) {
     // }
 }
 
-async function fetchPic(url) {
-    let res = await fetch(url, globalConfig.httpInit);
-    return await res.blob();
-}
-
-async function fetchLongText(mblogid, cache) {
+async function fetchLongText(mblogid, storage) {
     let api = `https://weibo.com/ajax/statuses/longtext?id=${mblogid}`;
     let res = await fetch(api, globalConfig.httpInit);
     let longText = (await res.json()).data.longTextContent;
@@ -102,7 +202,7 @@ async function fetchLongText(mblogid, cache) {
     return longText;
 }
 
-async function transText(text, topic_struct, url_struct, cache) {
+async function transText(text, topic_struct, url_struct, storage) {
     // console.log(`conv ${text} to`);
     var text = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : ""
         , topic_struct = arguments.length > 1 ? arguments[1] : void 0
@@ -146,7 +246,7 @@ async function transText(text, topic_struct, url_struct, cache) {
         )),
         console.assert(globalConfig.emoticon),
         text = text.replace(emojiExpr, (function (e) {
-            return transEmoji(e, cache);
+            return transEmoji(e, storage);
         }
         )),
         text);
@@ -221,10 +321,10 @@ function transBr() {
     return "<br />"
 }
 
-function transEmoji(t, cache) {
-    let url = getEmoji(t, cache);
+function transEmoji(t, storage) {
+    let url = getEmoji(t, storage);
     let o = t.slice(1, -1);
-    return url ? '<img alt="['.concat(o, ']" title="[').concat(o, ']" src="').concat(url, '" />') : t
+    return url ? '<img class="bk-emoji" alt="['.concat(o, ']" title="[').concat(o, ']" src="').concat(url, '" />') : t
 }
 
 async function fetchEmoticon() {
@@ -244,18 +344,19 @@ async function fetchEmoticon() {
         }
     }
     globalConfig.emoticon = emoticon;
-    console.log(emoticon);
+    // console.log(emoticon);
 }
 
-function getEmoji(e, cache) {
+function getEmoji(e, storage) {
     let emoticon = globalConfig.emoticon;
     if (void 0 === emoticon) {
         return '';
     }
     let url = emoticon.get(e);
     if (url) {
-        let filePath = `./${globalConfig.taskName}_files/` + getFilename(url);
-        cache.set(url, { 'file_path': filePath, 'downloaded': false });
+        let fileName = getFilename(url);
+        let filePath = `./${storage.taskName}_files/` + getFilename(url);
+        storage.cache.set(url, fileName);
         return filePath;
     } else {
         return '';
