@@ -48,18 +48,33 @@ async function fetchAllPostMetas(type = "myblog", range) {
         page++;
         if (noMore) break;
         await new Promise((resolve) => {
-            setTimeout(resolve, 5 * 1000);
+            setTimeout(resolve, 100);
         });
     }
+    let data = allPageData.flat();
     showTip(`数据拉取完成，等待下载到本地`);
-    let rawData = allPageData.flat();
+    return data;
+}
 
-    download(await generateHtml(rawData), `weiback-${Date.now()}-${type}.html`, "text/plain");
-    // download(
-    //     JSON.stringify(rawData, null, 2),
-    //     "weibo-" + Date.now() + "-" + type + ".json",
-    //     "text/plain"
-    // );
+async function fetchAllPosts(type = "myblog", range, outFormat="html") {
+    let metaData = await fetchAllPostMetas(type, range);
+    let data = '';
+    let outFileExt = '';
+
+    if (outFormat == 'html') {
+        let cache = new Map();
+        data = await generateHtml(metaData, cache);
+        outFileExt = '.html';
+    } else {
+        data = JSON.stringify(rawData, null, 2);
+        outFileExt = '.json';
+    }
+
+    download(
+        data,
+        "weibo-" + Date.now() + "-" + type + outFileExt,
+        "text/plain"
+    );
     console.log("all done");
     showTip(`完成，可以进行其它操作`);
 }
