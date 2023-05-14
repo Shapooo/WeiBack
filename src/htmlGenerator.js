@@ -33,21 +33,24 @@ function composePost(postMeta, isRetweet = false) {
     }
     let postDiv = document.createElement('div');
     postDiv.className = prefix;
-    let posterDiv = document.createElement('div');
-    posterDiv.className = prefix + 'er';
-    if (!isRetweet) {
-        let avatar = document.createElement('img');
-        avatar.className = prefix + 'er-avatar';
-        avatar.alt = "weibo poster";
-        avatar.src = postMeta.poster_avatar;
-        posterDiv.appendChild(avatar);
+    if (postMeta.poster_name) {
+        let posterDiv = document.createElement('div');
+        posterDiv.className = prefix + 'er';
+        if (!isRetweet) {
+            let avatar = document.createElement('img');
+            avatar.className = prefix + 'er-avatar';
+            avatar.alt = "weibo poster";
+            avatar.src = postMeta.poster_avatar;
+            posterDiv.appendChild(avatar);
+        }
+        let name = document.createElement('a');
+        name.className = prefix + 'er-name';
+        name.href = postMeta.poster_url;
+        name.innerText = postMeta.poster_name;
+        posterDiv.appendChild(name);
+        postDiv.appendChild(posterDiv);
+
     }
-    let name = document.createElement('a');
-    name.className = prefix + 'er-name';
-    name.href = postMeta.poster_url;
-    name.innerText = postMeta.poster_name;
-    posterDiv.appendChild(name);
-    postDiv.appendChild(posterDiv);
     let textDiv = document.createElement('div');
     textDiv.className = prefix + '-text bk-content';
     textDiv.innerHTML = postMeta.text;
@@ -98,11 +101,11 @@ async function parsePost(post, storage) {
     let pics = post.pic_ids && post.pic_ids.map((id) => picId2Location(id, post, storage));
     let video_urls = [];
     return {
-        poster_name: post.user.screen_name,
-        poster_url: 'https://weibo.com' + post.user.profile_url,
-        poster_avatar: url2path(post.user.avatar_hd, storage),
+        poster_name: post.user && post.user.screen_name,
+        poster_url: post.user && 'https://weibo.com' + post.user.profile_url,
+        poster_avatar: post.user && url2path(post.user.avatar_hd, storage),
         text: text,
-        post_url: `https://weibo.com/${post.user.idstr}/${post.mblogid}`,
+        post_url: post.user && `https://weibo.com/${post.user.idstr}/${post.mblogid}`,
         mblogid: post.mblogid,
         created_at: post.created_at,
         pics: pics,
