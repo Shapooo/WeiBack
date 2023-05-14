@@ -2,15 +2,17 @@ const HTML_GEN_TEMP = `<html lang="zh-CN"><head><meta charset="UTF-8"><meta http
 const POST_GEN_TEMP = `<div class="bk-post-wrapper"><div class="bk-poster"><img class="bk-poster-avatar" alt="weibo poster"> <a class="bk-poster-name"></a></div><div class="bk-post"><div class="bk-post-text bk-content"></div></div></div>`;
 const RETWEET_TEMP = `<div class="bk-retweet"><a class="bk-retweet-poster-name"></a><div class="bk-retweet-text bk-content"></div></div>`;
 
-async function generateHtml(posts, cache) {
+async function generateHtml(posts, name) {
+    globalConfig.taskName = name;
     await dataInit();
-    if (void 0 === cache) {
-        cache = new Map();
-    }
+    let cache = new Map();
     let inner = (await Promise.all(posts.map((post) => generateOnePost(post, cache)))).join('');
     let doc = (new DOMParser).parseFromString(HTML_GEN_TEMP, 'text/html');
     doc.body.innerHTML = inner;
-    return doc.documentElement.outerHTML;
+    const zip = new JSZip();
+    zip.file(name + '.html', doc.documentElement.outerHTML);
+    const resources = zip.folder(name + '_files');
+    return zip;
 }
 
 async function dataInit() {
@@ -252,7 +254,7 @@ function getEmoji(e, cache) {
     }
     let url = emoticon.get(e);
     if (url) {
-        let filePath = './WeiBack_files/' + getFilename(url);
+        let filePath = `./${globalConfig.taskName}_files/` + getFilename(url);
         cache.set(url, { 'file_path': filePath, 'downloaded': false });
         return filePath;
     } else {

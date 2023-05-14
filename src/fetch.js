@@ -58,21 +58,18 @@ async function fetchAllPostMetas(type = "myblog", range) {
 
 async function fetchAllPosts(type = "myblog", range, outFormat = "html") {
     let metaData = await fetchAllPostMetas(type, range);
-    let data;
-    let filename;
-    let contentType = 'text/plain';
 
     if (outFormat == 'html') {
-        let cache = new Map();
-        data = await generateHtml(metaData, cache);
-        filename = "weibo-" + Date.now() + "-" + type + '.html';
+        let taskName = "WeiBack-" + Date.now();
+        let zip = await generateHtml(metaData, taskName);
+        zip.generateAsync({ type: "blob" }).then(function (content) {
+            saveAs(content, taskName + '.zip');
+        });
     } else {
-        data = JSON.stringify(rawData, null, 2);
-        filename = "weibo-" + Date.now() + "-" + type + '.json';
+        let jsonStr = JSON.stringify(rawData, null, 2);
+        let file = new Blob([jsonStr], { type: 'application/json' });
+        saveAs(file, "weibo-" + Date.now() + "-" + type + '.json')
     }
-    let file = new Blob([data], { type: contentType });
-    console.log(typeof FileSaver);
-    saveAs(file, filename);
 
     console.log("all done");
     showTip(`完成，可以进行其它操作`);
