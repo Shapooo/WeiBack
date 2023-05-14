@@ -56,25 +56,24 @@ async function fetchAllPostMetas(type = "myblog", range) {
     return data;
 }
 
-async function fetchAllPosts(type = "myblog", range, outFormat="html") {
+async function fetchAllPosts(type = "myblog", range, outFormat = "html") {
     let metaData = await fetchAllPostMetas(type, range);
-    let data = '';
-    let outFileExt = '';
+    let data;
+    let filename;
+    let contentType = 'text/plain';
 
     if (outFormat == 'html') {
         let cache = new Map();
         data = await generateHtml(metaData, cache);
-        outFileExt = '.html';
+        filename = "weibo-" + Date.now() + "-" + type + '.html';
     } else {
         data = JSON.stringify(rawData, null, 2);
-        outFileExt = '.json';
+        filename = "weibo-" + Date.now() + "-" + type + '.json';
     }
+    let file = new Blob([data], { type: contentType });
+    console.log(typeof FileSaver);
+    saveAs(file, filename);
 
-    download(
-        data,
-        "weibo-" + Date.now() + "-" + type + outFileExt,
-        "text/plain"
-    );
     console.log("all done");
     showTip(`完成，可以进行其它操作`);
 }
