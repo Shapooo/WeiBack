@@ -25,7 +25,7 @@ async function fetchAllPosts(type = "myblog", range) {
 
     let storage = {
         resourceMap: new Map(),
-        taskName: 'WeiBack' + Date.now(),
+        taskName: `WeiBack-${type}-${Date.now()}`,
         resources: [],
     };
     await fetchEmoticon();
