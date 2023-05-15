@@ -6,6 +6,18 @@ const TITLE_PIC = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKkAA
 
 const BKBOX_TEMP = `<div class="bkBox-title">${TITLE_PIC}</div><nav><div class="navi"></div></nav><section><div class="box"></div></section>`;
 
+const STATUSES_CONFIG_API = "https://weibo.com/ajax/statuses/config";
+const STATUSES_MY_MICRO_BLOG_API = "https://weibo.com/ajax/statuses/mymblog";
+// const STATUSES_SHOW_API = "https://weibo.com/ajax/statuses/show";
+const STATUSES_LONGTEXT_API = "https://weibo.com/ajax/statuses/longtext";
+// const STATUSES_MENTIONS_API = "https://weibo.com/ajax/statuses/mentions";
+// const STATUSES_REPOST_API = "https://weibo.com/ajax/statuses/repostTimeline";
+const STATUSES_LIKE_LIST_API = "https://weibo.com/ajax/statuses/likelist";
+// const STATUSES_LIKE_SHOW_API = "https://weibo.com/ajax/statuses/likeShow";
+// const STATUSES_SET_LIKE_API = "https://weibo.com/ajax/statuses/setLike";
+// const STATUSES_CREATE_FAVORITES_API = "https://weibo.com/ajax/statuses/createFavorites";
+const STATUSES_FAVORITES_API = "https://weibo.com/ajax/favorites/all_fav";
+// const SEARCH_ALL_API = "https://weibo.com/ajax/search/all";
 
 let globalConfig = {
     uid: $CONFIG.uid,

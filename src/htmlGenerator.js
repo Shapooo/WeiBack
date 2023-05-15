@@ -114,7 +114,7 @@ async function parsePost(post, storage) {
 }
 
 async function fetchLongText(mblogid, storage) {
-    let api = `https://weibo.com/ajax/statuses/longtext?id=${mblogid}`;
+    let api = `${STATUSES_LONGTEXT_API}?id=${mblogid}`;
     let res = await fetch(api, globalConfig.httpInit);
     let longText = (await res.json()).data.longTextContent;
     return longText;
@@ -244,7 +244,7 @@ function transEmoji(t, storage) {
 }
 
 async function fetchEmoticon() {
-    let api = 'https://weibo.com/ajax/statuses/config';
+    let api = STATUSES_CONFIG_API;
     let res = await fetch(api, globalConfig.httpInit);
     let rawEmoticon = (await res.json()).data.emoticon;
     console.assert(void 0 !== rawEmoticon);

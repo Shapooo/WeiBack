@@ -4,14 +4,14 @@ async function fetchMyContent(page = 1, type = "myblog") {
 }
 
 async function fetchPostMeta(uid = 0, page = 1, type = "myblog") {
-    let api = `https://weibo.com/ajax/statuses/mymblog?uid=${uid}&page=${page}&feature=0&with_total=true`;
+    let api = `${STATUSES_MY_MICRO_BLOG_API}?uid=${uid}&page=${page}&feature=0&with_total=true`;
 
     if (type === "fav") {
-        api = `https://weibo.com/ajax/favorites/all_fav?uid=${uid}&page=${page}&with_total=true`;
+        api = `${STATUSES_FAVORITES_API}?uid=${uid}&page=${page}&with_total=true`;
     }
 
     if (type === "like") {
-        api = `https://weibo.com/ajax/statuses/likelist?uid=${uid}&page=${page}&with_total=true`;
+        api = `${STATUSES_LIKE_LIST_API}?uid=${uid}&page=${page}&with_total=true`;
     }
 
     console.log(`request ${api}`);
