@@ -82,7 +82,6 @@ function picId2Location(id, post, storage) {
 }
 
 async function parsePost(post, storage) {
-    console.log(post);
     let text = await transText(post.isLongText ? await fetchLongText(post.mblogid) : post.text_raw,
         post.topic_struct, post.url_struct, storage);
     let pics = post.pic_ids && post.pic_ids.map((id) => picId2Location(id, post, storage));
@@ -173,34 +172,15 @@ function resetUrl(t) {
     return i ? "https://m.weibo.cn/api/scheme?scheme=".concat(encodeURIComponent(t)) : t
 }
 
-function transUrl(input, url_struct, topic_struct, a) {
-    var urlObj = url_struct && url_struct.find((function (e) {
-        return e.short_url === input
-    }
-    ))
-        , urlExpr = /(http|https):\/\/([\w.]+\/?)\S*/
-        , c = '<a class="bk-link" target="_blank"';
-    if (urlObj && urlObj.short_url && urlObj.short_url === input) {
-        if (urlObj && urlObj.url_type_pic) {
-            if (urlObj.pic_infos && urlObj.pic_ids && urlObj.pic_infos["".concat(urlObj.pic_ids[0])]) {
-                var l = urlObj.pic_infos["".concat(urlObj.pic_ids[0])].large.url;
-                l = l.replace("http://", "https://"),
-                    c += " data-pid=".concat(Object.keys(urlObj.pic_infos)[0], '  href="').concat(l, '"')
-            } else
-                urlObj.page_id && urlObj.page_id.indexOf("100808") > -1 ? c += ' href="https://weibo.com/p/'.concat(urlObj.page_id, '"') : c += ' href="'.concat(resetUrl(url_struct), '"');
-            c += '><img class="bk-icon-link" src="'.concat(urlObj.url_type_pic.slice(0, -4) + "_default.png", '"/>').concat(urlObj.url_title, "</a>")
-        } else
-            c += ' href="'.concat(resetUrl(url_struct), '">').concat(urlObj.url_title, "</a>")
-    } else {
-        if (input && "#" === input.slice(0, 1))
-            return transTopic(input, topic_struct);
-        if (!urlExpr.test(input))
-            return input;
-        var u = /^http:\/\/t\.cn/;
-        u.test(input) && (input = input.replace(/http:/, "https:")),
-            c += ' href="'.concat(input, '"><img class="bk-icon-link" src="https://h5.sinaimg.cn/upload/2015/09/25/3/timeline_card_small_web_default.png"/>网页链接</a>')
-    }
-    return c
+function transUrl(input, url_struct) {
+    let urlExpr = /(http|https):\/\/([\w.]+\/?)\S*/
+        , result = '<a class="bk-link" target="_blank"';
+    if (!urlExpr.test(input))
+        return input;
+    var u = /^http:\/\/t\.cn/;
+    u.test(input) && (input = input.replace(/http:/, "https:")),
+        result += ' href="'.concat(input, '"><img class="bk-icon-link" src="https://h5.sinaimg.cn/upload/2015/09/25/3/timeline_card_small_web_default.png"/>网页链接</a>')
+    return result
 }
 
 function transTopic(t, topic_struct) {
