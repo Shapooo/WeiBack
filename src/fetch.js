@@ -20,18 +20,15 @@ async function fetchPostMeta(uid = 0, page = 1, type = "myblog") {
     return data;
 }
 
-async function fetchAllPosts(type = "myblog", range, outFormat = 'html') {
+async function fetchAllPosts(type = "myblog", range) {
     console.log(`fetching ${type} post ${range}`)
 
-    let storage;
-    if (outFormat = 'html') {
-        storage = {
-            resourceMap: new Map(),
-            taskName: 'WeiBack' + Date.now(),
-            resources: [],
-        }
-        await fetchEmoticon();
-    }
+    let storage = {
+        resourceMap: new Map(),
+        taskName: 'WeiBack' + Date.now(),
+        resources: [],
+    };
+    await fetchEmoticon();
 
     let uid = globalConfig.uid;
     let page = 1;
@@ -57,58 +54,44 @@ async function fetchAllPosts(type = "myblog", range, outFormat = 'html') {
             );
         }
 
-        if (outFormat == 'html') {
-            allPageData.push(await generateHTMLPage(data, storage));
-            let PicToFetch = [];
-            storage.resourceMap.forEach((v, url) => {
-                if (!v.saved) {
-                    PicToFetch.push([url, v.fileName])
-                }
+        allPageData.push(await generateHTMLPage(data, storage));
+        let PicToFetch = [];
+        storage.resourceMap.forEach((v, url) => {
+            if (!v.saved) {
+                PicToFetch.push([url, v.fileName])
+            }
+        });
+        storage.resources = storage.resources.concat(await Promise.all(PicToFetch.map((picItem) => {
+            return fetchPic(picItem[0]).then((blob) => {
+                storage.resourceMap.set(picItem[0], { fileName: picItem[1], saved: true })
+                return [picItem[1], blob];
             });
-            storage.resources = storage.resources.concat(await Promise.all(PicToFetch.map((picItem) => {
-                return fetchPic(picItem[0]).then((blob) => {
-                    storage.resourceMap.set(picItem[0], { fileName: picItem[1], saved: true })
-                    return [picItem[1], blob];
-                });
-            })));
-        } else {
-            allPageData.push(pageData);
-        }
+        })));
+
         page++;
         if (noMore) break;
         await new Promise((resolve) => {
-            if (outFormat == 'html') {
-                setTimeout(resolve, 100);
-            } else {
-                setTimeout(resolve, 5 * 1000);
-            }
-
+            setTimeout(resolve, 10 * 1000);
         });
     }
 
     showTip(`数据拉取完成，等待下载到本地`);
-    if (outFormat == 'html') {
-        let name = storage.taskName;
-        let doc = (new DOMParser).parseFromString(HTML_GEN_TEMP, 'text/html');
-        doc.body.innerHTML = allPageData.join('');
-        const zip = new JSZip();
-        zip.file(name + '.html', doc.documentElement.outerHTML);
-        const resources = zip.folder(name + '_files');
+    let name = storage.taskName;
+    let doc = (new DOMParser).parseFromString(HTML_GEN_TEMP, 'text/html');
+    doc.body.innerHTML = allPageData.join('');
+    const zip = new JSZip();
+    zip.file(name + '.html', doc.documentElement.outerHTML);
+    const resources = zip.folder(name + '_files');
 
-        storage.resources.forEach((item) => {
-            resources.file(item[0], item[1], { base64: true });
-        })
+    storage.resources.forEach((item) => {
+        resources.file(item[0], item[1], { base64: true });
+    })
 
-        zip.generateAsync({ type: "blob" }).then(function (content) {
-            saveAs(content, name + '.zip');
-        }).catch((err) => {
-            console.error(err);
-        });
-    } else {
-        let jsonStr = JSON.stringify(allPageData.flat(), null, 2);
-        let file = new Blob([jsonStr], { type: 'application/json' });
-        saveAs(file, "weibo-" + Date.now() + "-" + type + '.json')
-    }
+    zip.generateAsync({ type: "blob" }).then(function (content) {
+        saveAs(content, name + '.zip');
+    }).catch((err) => {
+        console.error(err);
+    });
 
     console.log("all done");
     showTip(`完成，可以进行其它操作`);
