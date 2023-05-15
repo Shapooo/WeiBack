@@ -17,11 +17,17 @@ body {
     height: 60px
 }
 
-.bk-poster-avatar {
+.bk-poster-avatar,
+.bk-retweeter-avatar {
     height: 60px;
     width: 60px;
     border-radius: 50%;
     margin: auto 8px
+}
+
+.bk-retweeter-avatar {
+    height: 40px;
+    width: 40px
 }
 
 .bk-post-text {
@@ -35,13 +41,16 @@ body {
 }
 
 .bk-retweeter {
-    margin: 8px 24px 8px 76px;
-    vertical-align: middle
+    display: flex;
+    align-items: center;
+    vertical-align: middle;
+    height: 40px;
+    margin: 8px 24px 8px 76px
 }
 
 .bk-retweet {
     background: #f9f9f9;
-    padding: 2px auto
+    padding: 2px 0
 }
 
 .bk-pic {
@@ -81,4 +90,9 @@ body {
 
 .bk-emoji {
     height: 20px
+}
+
+.bk-create-detail {
+    font-size: 10px;
+    color: #939393
 }

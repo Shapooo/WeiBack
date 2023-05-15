@@ -69,6 +69,13 @@ function composePost(postMeta, isRetweet = false) {
         });
         postDiv.appendChild(mediaDiv);
     }
+    if (postMeta.post_url) {
+        let post_url = document.createElement('a');
+        post_url.innerHTML = '[原贴链接]';
+        post_url.href = postMeta.post_url;
+        post_url.className = 'bk-link bk-content';
+        postDiv.appendChild(post_url);
+    }
     return postDiv;
 }
 
