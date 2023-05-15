@@ -89,7 +89,7 @@ async function parsePost(post, storage) {
     return {
         poster_name: post.user && post.user.screen_name,
         poster_url: post.user && 'https://weibo.com' + post.user.profile_url,
-        poster_avatar: post.user && url2path(post.user.avatar_hd, storage),
+        poster_avatar: post.user && post.user.avatar_hd && url2path(post.user.avatar_hd, storage),
         text: text,
         post_url: post.user && `https://weibo.com/${post.user.idstr}/${post.mblogid}`,
         mblogid: post.mblogid,
