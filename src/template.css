@@ -73,8 +73,10 @@ body {
 }
 
 .bk-icon-link {
-    height: 12px;
-    filter: sepia(100%) saturate(3800%) contrast(75%)
+    height: 20px;
+    filter: sepia(100%) saturate(3800%) contrast(75%);
+    vertical-align: middle;
+    margin-bottom: 4px;
 }
 
 .bk-link,
@@ -89,7 +91,9 @@ body {
 }
 
 .bk-emoji {
-    height: 20px
+    height: 20px;
+    vertical-align: middle;
+    margin-bottom: 4px;
 }
 
 .bk-create-detail {

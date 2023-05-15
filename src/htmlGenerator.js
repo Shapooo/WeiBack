@@ -1,4 +1,4 @@
-const HTML_GEN_TEMP = `<html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{background-color:#f1f2f5}.bk-post-wrapper{border-radius:4px;background:#fff;width:700px;margin:8px auto;padding:10px 0}.bk-poster{display:flex;align-items:center;vertical-align:middle;height:60px}.bk-poster-avatar,.bk-retweeter-avatar{height:60px;width:60px;border-radius:50%;margin:auto 8px}.bk-retweeter-avatar{height:40px;width:40px}.bk-post-text{background:#fff}.bk-content{margin:8px 24px 8px 76px;font-size:15px;line-height:24px}.bk-retweeter{display:flex;align-items:center;vertical-align:middle;height:40px;margin:8px 24px 8px 76px}.bk-retweet{background:#f9f9f9;padding:2px 0}.bk-pic{max-width:600px;max-height:400px;margin:auto}.bk-poster-name,.bk-retweeter-name{color:#000;font-weight:700;text-decoration:none;font-family:Arial,Helvetica,sans-serif}.bk-poster-name:hover,.bk-retweeter-name:hover{color:#eb7350}.bk-icon-link{height:12px;filter:sepia(100%) saturate(3800%) contrast(75%)}.bk-link,.bk-user{color:#eb7350;text-decoration:none}.bk-link:hover,.bk-user:hover{text-decoration:underline}.bk-emoji{height:20px}.bk-create-detail{font-size:10px;color:#939393}</style><title>微博备份</title></head><body></body></html>`;
+const HTML_GEN_TEMP = `<html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{background-color:#f1f2f5}.bk-post-wrapper{border-radius:4px;background:#fff;width:700px;margin:8px auto;padding:10px 0}.bk-poster{display:flex;align-items:center;vertical-align:middle;height:60px}.bk-poster-avatar,.bk-retweeter-avatar{height:60px;width:60px;border-radius:50%;margin:auto 8px}.bk-retweeter-avatar{height:40px;width:40px}.bk-post-text{background:#fff}.bk-content{margin:8px 24px 8px 76px;font-size:15px;line-height:24px}.bk-retweeter{display:flex;align-items:center;vertical-align:middle;height:40px;margin:8px 24px 8px 76px}.bk-retweet{background:#f9f9f9;padding:2px 0}.bk-pic{max-width:600px;max-height:400px;margin:auto}.bk-poster-name,.bk-retweeter-name{color:#000;font-weight:700;text-decoration:none;font-family:Arial,Helvetica,sans-serif}.bk-poster-name:hover,.bk-retweeter-name:hover{color:#eb7350}.bk-icon-link{height:20px;filter:sepia(100%) saturate(3800%) contrast(75%);vertical-align:middle;margin-bottom:4px}.bk-link,.bk-user{color:#eb7350;text-decoration:none}.bk-link:hover,.bk-user:hover{text-decoration:underline}.bk-emoji{height:20px;vertical-align:middle;margin-bottom:4px}.bk-create-detail{font-size:10px;color:#939393}</style><title>微博备份</title></head><body></body></html>`;
 
 async function generateHTMLPage(posts, storage) {
     return (await Promise.all(posts.map((post) => generateHTMLPost(post, storage)))).join('');
@@ -82,6 +82,7 @@ function picId2Location(id, post, storage) {
 }
 
 async function parsePost(post, storage) {
+    console.log(post);
     let text = await transText(post.isLongText ? await fetchLongText(post.mblogid) : post.text_raw,
         post.topic_struct, post.url_struct, storage);
     let pics = post.pic_ids && post.pic_ids.map((id) => picId2Location(id, post, storage));
@@ -187,7 +188,7 @@ function transUrl(input, url_struct, topic_struct, a) {
                     c += " data-pid=".concat(Object.keys(urlObj.pic_infos)[0], '  href="').concat(l, '"')
             } else
                 urlObj.page_id && urlObj.page_id.indexOf("100808") > -1 ? c += ' href="https://weibo.com/p/'.concat(urlObj.page_id, '"') : c += ' href="'.concat(resetUrl(url_struct), '"');
-            c += '><img class="icon-link" src="'.concat(urlObj.url_type_pic.slice(0, -4) + "_default.png", '"/>').concat(urlObj.url_title, "</a>")
+            c += '><img class="bk-icon-link" src="'.concat(urlObj.url_type_pic.slice(0, -4) + "_default.png", '"/>').concat(urlObj.url_title, "</a>")
         } else
             c += ' href="'.concat(resetUrl(url_struct), '">').concat(urlObj.url_title, "</a>")
     } else {
@@ -268,7 +269,7 @@ function getFilename(url) {
 
 function url2path(url, storage) {
     let fileName = getFilename(url);
-    let filePath = `./${storage.taskName}_files/` + getFilename(url);
+    let filePath = `./${storage.taskName}_files/` + fileName;
     if (void 0 === storage.resourceMap.get(url)) {
         storage.resourceMap.set(url, { fileName: fileName, saved: false });
     }
