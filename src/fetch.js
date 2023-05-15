@@ -20,8 +20,19 @@ async function fetchPostMeta(uid = 0, page = 1, type = "myblog") {
     return data;
 }
 
-async function fetchAllPostMetas(type = "myblog", range) {
+async function fetchAllPosts(type = "myblog", range, outFormat = 'html') {
     console.log(`fetching ${type} post ${range}`)
+
+    let storage;
+    if (outFormat = 'html') {
+        storage = {
+            resourceMap: new Map(),
+            taskName: 'WeiBack' + Date.now(),
+            resources: [],
+        }
+        await fetchEmoticon();
+    }
+
     let uid = globalConfig.uid;
     let page = 1;
     let allPageData = [];
@@ -29,12 +40,12 @@ async function fetchAllPostMetas(type = "myblog", range) {
     for (let index = range[0]; index <= range[1]; index++) {
         console.log("scan", "page", page);
         showTip(`正在备份第 ${page} 页<br>因微博速率限制，过程可能较长，先干点别的吧`);
+        let data;
         for (let index = 0; index < 10; index++) {
             const pageData = await fetchPostMeta(uid, page, type);
             if (pageData.ok) {
-                const dataList = type === "fav" ? pageData.data.status : pageData.data.list;
-                allPageData.push(dataList);
-                if (dataList.length === 0) noMore = true;
+                data = type === "fav" ? pageData.data.status : pageData.data.list;
+                if (data.length === 0) noMore = true;
                 break;
             }
             await new Promise((resolve) => {
@@ -45,35 +56,65 @@ async function fetchAllPostMetas(type = "myblog", range) {
                 `[重试]备份第 ${page} 页，错误内容： ${JSON.stringify(pageData)}`
             );
         }
+
+        if (outFormat == 'html') {
+            allPageData.push(await generateHTMLPage(data, storage));
+            let PicToFetch = [];
+            storage.resourceMap.forEach((v, url) => {
+                if (!v.saved) {
+                    PicToFetch.push([url, v.fileName])
+                }
+            });
+            storage.resources = storage.resources.concat(await Promise.all(PicToFetch.map((picItem) => {
+                return fetchPic(picItem[0]).then((blob) => {
+                    storage.resourceMap.set(picItem[0], { fileName: picItem[1], saved: true })
+                    return [picItem[1], blob];
+                });
+            })));
+        } else {
+            allPageData.push(pageData);
+        }
         page++;
         if (noMore) break;
         await new Promise((resolve) => {
-            setTimeout(resolve, 100);
+            if (outFormat == 'html') {
+                setTimeout(resolve, 100);
+            } else {
+                setTimeout(resolve, 5 * 1000);
+            }
+
         });
     }
-    let data = allPageData.flat();
+
     showTip(`数据拉取完成，等待下载到本地`);
-    return data;
-}
-
-async function fetchAllPosts(type = "myblog", range, outFormat = "html") {
-    let metaData = await fetchAllPostMetas(type, range);
-
     if (outFormat == 'html') {
-        let taskName = "WeiBack-" + Date.now();
-        let zip = await generateHtml(metaData, taskName);
+        let name = storage.taskName;
+        let doc = (new DOMParser).parseFromString(HTML_GEN_TEMP, 'text/html');
+        doc.body.innerHTML = allPageData.join('');
+        const zip = new JSZip();
+        zip.file(name + '.html', doc.documentElement.outerHTML);
+        const resources = zip.folder(name + '_files');
+
+        storage.resources.forEach((item) => {
+            resources.file(item[0], item[1], { base64: true });
+        })
+
         zip.generateAsync({ type: "blob" }).then(function (content) {
-            console.log(content);
-            saveAs(content, taskName + '.zip');
+            saveAs(content, name + '.zip');
         }).catch((err) => {
             console.error(err);
         });
     } else {
-        let jsonStr = JSON.stringify(rawData, null, 2);
+        let jsonStr = JSON.stringify(allPageData.flat(), null, 2);
         let file = new Blob([jsonStr], { type: 'application/json' });
         saveAs(file, "weibo-" + Date.now() + "-" + type + '.json')
     }
 
     console.log("all done");
     showTip(`完成，可以进行其它操作`);
+}
+
+async function fetchPic(url) {
+    let res = await fetch(url, globalConfig.httpInit);
+    return (await res.blob());
 }
