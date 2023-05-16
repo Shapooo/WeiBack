@@ -1,257 +1,244 @@
-const HTML_GEN_TEMP = `<html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{background-color:#f1f2f5}.bk-post-wrapper{border-radius:4px;background:#fff;width:700px;margin:8px auto;padding:10px 0}.bk-poster{display:flex;align-items:center;vertical-align:middle;height:60px}.bk-poster-avatar,.bk-retweeter-avatar{height:60px;width:60px;border-radius:50%;margin:auto 8px}.bk-retweeter-avatar{height:40px;width:40px}.bk-post-text{background:#fff}.bk-content{margin:8px 24px 8px 76px;font-size:15px;line-height:24px}.bk-retweeter{display:flex;align-items:center;vertical-align:middle;height:40px;margin:8px 24px 8px 76px}.bk-retweet{background:#f9f9f9;padding:2px 0}.bk-pic{max-width:600px;max-height:400px;margin:auto}.bk-poster-name,.bk-retweeter-name{color:#000;font-weight:700;text-decoration:none;font-family:Arial,Helvetica,sans-serif}.bk-poster-name:hover,.bk-retweeter-name:hover{color:#eb7350}.bk-icon-link{height:20px;filter:sepia(100%) saturate(3800%) contrast(75%);vertical-align:middle;margin-bottom:4px}.bk-link,.bk-user{color:#eb7350;text-decoration:none}.bk-link:hover,.bk-user:hover{text-decoration:underline}.bk-emoji{height:20px;vertical-align:middle;margin-bottom:4px}.bk-create-detail{font-size:10px;color:#939393}</style><title>微博备份</title></head><body></body></html>`;
+const HTML_GEN_TEMP = '<html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{background-color:#f1f2f5}.bk-post-wrapper{border-radius:4px;background:#fff;width:700px;margin:8px auto;padding:10px 0}.bk-poster{display:flex;align-items:center;vertical-align:middle;height:60px}.bk-poster-avatar,.bk-retweeter-avatar{height:60px;width:60px;border-radius:50%;margin:auto 8px}.bk-retweeter-avatar{height:40px;width:40px}.bk-post-text{background:#fff}.bk-content{margin:8px 24px 8px 76px;font-size:15px;line-height:24px}.bk-retweeter{display:flex;align-items:center;vertical-align:middle;height:40px;margin:8px 24px 8px 76px}.bk-retweet{background:#f9f9f9;padding:2px 0}.bk-pic{max-width:600px;max-height:400px;margin:auto}.bk-poster-name,.bk-retweeter-name{color:#000;font-weight:700;text-decoration:none;font-family:Arial,Helvetica,sans-serif}.bk-poster-name:hover,.bk-retweeter-name:hover{color:#eb7350}.bk-icon-link{height:20px;filter:sepia(100%) saturate(3800%) contrast(75%);vertical-align:middle;margin-bottom:4px}.bk-link,.bk-user{color:#eb7350;text-decoration:none}.bk-link:hover,.bk-user:hover{text-decoration:underline}.bk-emoji{height:20px;vertical-align:middle;margin-bottom:4px}.bk-create-detail{font-size:10px;color:#939393}</style><title>微博备份</title></head><body></body></html>'
 
 async function generateHTMLPage(posts, storage) {
-    return (await Promise.all(posts.map((post) => generateHTMLPost(post, storage)))).join('');
+    return (await Promise.all(posts.map((post) => generateHTMLPost(post, storage)))).join('')
 }
 
 function composePost(postMeta, isRetweet = false) {
-    let prefix = 'bk-post';
+    let prefix = 'bk-post'
     if (isRetweet) {
-        prefix = 'bk-retweet';
+        prefix = 'bk-retweet'
     }
-    let postDiv = document.createElement('div');
-    postDiv.className = prefix;
-    if (postMeta.poster_name) {
-        let posterDiv = document.createElement('div');
-        posterDiv.className = prefix + 'er';
-        let avatar = document.createElement('img');
-        avatar.className = prefix + 'er-avatar';
-        avatar.alt = "头像";
-        avatar.src = postMeta.poster_avatar;
-        posterDiv.appendChild(avatar);
-        let name = document.createElement('a');
-        name.className = prefix + 'er-name';
-        name.href = postMeta.poster_url;
-        name.innerText = postMeta.poster_name;
-        posterDiv.appendChild(name);
-        let createDetail = document.createElement('p');
-        createDetail.className = 'bk-create-detail';
-        createDetail.innerHTML = `&nbsp;&nbsp;&nbsp;${postMeta.created_at} ${postMeta.region_name}`;
-        posterDiv.appendChild(createDetail);
-        postDiv.appendChild(posterDiv);
+    const postDiv = document.createElement('div')
+    postDiv.className = prefix
+    if (postMeta.posterName) {
+        const posterDiv = document.createElement('div')
+        posterDiv.className = prefix + 'er'
+        const avatar = document.createElement('img')
+        avatar.className = prefix + 'er-avatar'
+        avatar.alt = '头像'
+        avatar.src = postMeta.posterAvatar
+        posterDiv.appendChild(avatar)
+        const name = document.createElement('a')
+        name.className = prefix + 'er-name'
+        name.href = postMeta.posterUrl
+        name.innerText = postMeta.posterName
+        posterDiv.appendChild(name)
+        const createDetail = document.createElement('p')
+        createDetail.className = 'bk-create-detail'
+        createDetail.innerHTML = `&nbsp&nbsp&nbsp${postMeta.createdAt} ${postMeta.regionName}`
+        posterDiv.appendChild(createDetail)
+        postDiv.appendChild(posterDiv)
     }
-    let textDiv = document.createElement('div');
-    textDiv.className = prefix + '-text bk-content';
-    textDiv.innerHTML = postMeta.text;
-    postDiv.appendChild(textDiv);
+    const textDiv = document.createElement('div')
+    textDiv.className = prefix + '-text bk-content'
+    textDiv.innerHTML = postMeta.text
+    postDiv.appendChild(textDiv)
     if (postMeta.pics) {
-        let mediaDiv = document.createElement('div');
-        mediaDiv.className = prefix + '-media bk-content';
+        const mediaDiv = document.createElement('div')
+        mediaDiv.className = prefix + '-media bk-content'
         postMeta.pics.forEach(element => {
-            let pic = document.createElement('img');
-            pic.className = 'bk-pic';
-            pic.alt = '[图片]';
-            pic.src = element;
-            mediaDiv.appendChild(pic);
-        });
-        postDiv.appendChild(mediaDiv);
+            const pic = document.createElement('img')
+            pic.className = 'bk-pic'
+            pic.alt = '[图片]'
+            pic.src = element
+            mediaDiv.appendChild(pic)
+        })
+        postDiv.appendChild(mediaDiv)
     }
-    if (postMeta.post_url) {
-        let post_url = document.createElement('a');
-        post_url.innerHTML = '[原贴链接]';
-        post_url.href = postMeta.post_url;
-        post_url.className = 'bk-link bk-content';
-        postDiv.appendChild(post_url);
+    if (postMeta.postUrl) {
+        const postUrl = document.createElement('a')
+        postUrl.innerHTML = '[原贴链接]'
+        postUrl.href = postMeta.postUrl
+        postUrl.className = 'bk-link bk-content'
+        postDiv.appendChild(postUrl)
     }
-    return postDiv;
+    return postDiv
 }
 
 async function generateHTMLPost(post, storage) {
-    let wrapper = document.createElement('div');
-    wrapper.className = 'bk-post-wrapper';
-    wrapper.appendChild(composePost(await parsePost(post, storage)));
+    const wrapper = document.createElement('div')
+    wrapper.className = 'bk-post-wrapper'
+    wrapper.appendChild(composePost(await parsePost(post, storage)))
     if (post.retweeted_status) {
-        wrapper.appendChild(composePost(await parsePost(post.retweeted_status, storage), true));
+        wrapper.appendChild(composePost(await parsePost(post.retweeted_status, storage), true))
     }
-    return wrapper.outerHTML;
+    return wrapper.outerHTML
 }
 
 function picId2Location(id, post, storage) {
     if (post.pic_infos) {
-        return url2path(post.pic_infos[id].large.url, storage);
+        return url2path(post.pic_infos[id].large.url, storage)
     } else if (post.mix_media_info) {
         for (const item of post.mix_media_info.items) {
-            if (item.type == 'pic' && item.id == id) {
-                return url2path(item.data.largest.url, storage);
+            if (item.type === 'pic' && item.id === id) {
+                return url2path(item.data.largest.url, storage)
             }
         }
     } else {
-        return '';
+        return ''
     }
-
 }
 
 async function parsePost(post, storage) {
-    let text = await transText(post.isLongText ? await fetchLongText(post.mblogid) : post.text_raw,
-        post.topic_struct, post.url_struct, storage);
-    let pics = post.pic_ids && post.pic_ids.map((id) => picId2Location(id, post, storage));
-    let video_urls = [];
+    const text = await transText(post.isLongText ? await fetchLongText(post.mblogid) : post.text_raw,
+        post.topic_struct, post.url_struct, storage)
+    const pics = post.pic_ids && post.pic_ids.map((id) => picId2Location(id, post, storage))
+    const videos = []
     return {
-        poster_name: post.user && post.user.screen_name,
-        poster_url: post.user && 'https://weibo.com' + post.user.profile_url,
-        poster_avatar: post.user && post.user.avatar_hd && url2path(post.user.avatar_hd, storage),
-        text: text,
-        post_url: post.user && `https://weibo.com/${post.user.idstr}/${post.mblogid}`,
+        posterName: post.user && post.user.screen_name,
+        posterUrl: post.user && 'https://weibo.com' + post.user.profile_url,
+        posterAvatar: post.user && post.user.avatar_hd && url2path(post.user.avatar_hd, storage),
+        text,
+        postUrl: post.user && `https://weibo.com/${post.user.idstr}/${post.mblogid}`,
         mblogid: post.mblogid,
-        created_at: post.created_at,
-        region_name: post.region_name,
-        pics: pics,
-        videos: video_urls,
+        createdAt: post.created_at,
+        regionName: post.region_name,
+        pics,
+        videos
     }
 }
 
-async function fetchLongText(mblogid, storage) {
-    let api = `${STATUSES_LONGTEXT_API}?id=${mblogid}`;
-    let res = await fetch(api, globalConfig.httpInit);
-    let longText = (await res.json()).data.longTextContent;
-    return longText;
+async function fetchLongText(mblogid) {
+    const api = `${STATUSES_LONGTEXT_API}?id=${mblogid}`
+    const res = await fetch(api, globalConfig.httpInit)
+    const longText = (await res.json()).data.longTextContent
+    return longText
 }
 
-async function transText(text, topic_struct, url_struct, storage) {
-    var text = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : ""
-        , topic_struct = arguments.length > 1 ? arguments[1] : void 0
-        , url_struct = arguments.length > 2 ? arguments[2] : void 0
-        , o = {
-            url: "(http|https)://[a-zA-Z0-9$%&~_#/.\\-;:=,?]{5,280}",
-            stock: "\\$([^\\$]+)\\$",
-            br: "\\n",
-            singleQuote: "(&|&amp;)#39;"
-        }
-        , atExpr = /@[\u4e00-\u9fa5|\uE7C7-\uE7F3|\w_\-·]+/g //at id
-        , emojiExpr = /(\[.*?\])(?!#)/g //emoji
-        , r = new RegExp(Object.values(o).join("|"), "g")
-        , emailExpr = /[A-Za-z0-9]+([_\.][A-Za-z0-9]+)*@([A-Za-z0-9\-]+\.)+[A-Za-z]{2,6}/g // mail addr
-        , topicExpr = /#([^#]+)#/g //topic
-        , u = [];
-    let ret = text && (text = text.replace(emailExpr, (function (t) { // mail addr
+async function transText(text, topicStruct, urlStruct, storage) {
+    const o = {
+        url: '(http|https)://[a-zA-Z0-9$%&~_#/.\\-:=,?]{5,280}',
+        stock: '\\$([^\\$]+)\\$',
+        br: '\\n',
+        singleQuote: '(&|&amp)#39'
+    }
+    const atExpr = /@[\u4e00-\u9fa5|\uE7C7-\uE7F3|\w_\-·]+/g // at id
+    const emojiExpr = /(\[.*?\])(?!#)/g // emoji
+    const r = new RegExp(Object.values(o).join('|'), 'g')
+    const emailExpr = /[A-Za-z0-9]+([_.][A-Za-z0-9]+)*@([A-Za-z0-9-]+\.)+[A-Za-z]{2,6}/g // mail addr
+    const topicExpr = /#([^#]+)#/g // topic
+    const u = []
+    const ret = text && (text = text.replace(emailExpr, function (t) { // mail addr
         if (t.match(atExpr)) {
-            var e = t.match(atExpr);
+            const e = t.match(atExpr)
             u.push(e && e[0])
         }
         return t
-    }
-    )),
-        text = text.replace(/&#39;/g, "'"),
-        text = text.replace(r, (function (e) {
+    }),
+        text = text.replace(/&#39/g, '"'),
+        text = text.replace(r, function (e) {
             if (e) {
-                var o = e.slice(0, 1);
-                return "\n" === e ? transBr() : "h" === o || url_struct ? transUrl(e, url_struct, topic_struct) : e
+                const o = e.slice(0, 1)
+                return e === '\n' ? transBr() : o === 'h' || urlStruct ? transUrl(e, urlStruct, topicStruct) : e
             }
-        }
-        )),
-        text = text.replace(atExpr, (function (e) {
-            return -1 !== u.indexOf(e) ? e : transUser(e)
-        }
-        )),
-        text = text.replace(topicExpr, (function (e) {
-            var a = e.slice(0, 1);
-            return "#" === a && "#&#" && isSuperTopic(e, url_struct) !== e ? transTopic(e, topic_struct) : e
-        }
-        )),
+        }),
+        text = text.replace(atExpr, function (e) {
+            return u.indexOf(e) !== -1 ? e : transUser(e)
+        }),
+        text = text.replace(topicExpr, function (e) {
+            const a = e.slice(0, 1)
+            return a === '#' && '#&#' && isSuperTopic(e, urlStruct) !== e ? transTopic(e, topicStruct) : e
+        }),
         console.assert(globalConfig.emoticon),
-        text = text.replace(emojiExpr, (function (e) {
-            return transEmoji(e, storage);
-        }
-        )),
-        text);
-    return ret;
+        text = text.replace(emojiExpr, function (e) {
+            return transEmoji(e, storage)
+        }),
+        text)
+    return ret
 }
 
-function isSuperTopic(input, url_struct) {
-    var input = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : ""
-        , url_struct = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : [];
-    return !(!input || !url_struct.length) && url_struct.find((function (e) {
+function isSuperTopic(input, urlStruct) {
+    input = input !== undefined ? input : ''
+    urlStruct = urlStruct !== undefined ? urlStruct : []
+    return (input && urlStruct.length) && urlStruct.find(function (e) {
         return e.short_url === input
-    }
-    ))
+    })
 }
 
 function resetUrl(t) {
-    var e = /sinaweibo:\/\/([\w.]+\/?)\S*/
-        , i = e.test(t);
-    return i ? "https://m.weibo.cn/api/scheme?scheme=".concat(encodeURIComponent(t)) : t
+    const e = /sinaweibo:\/\/([\w.]+\/?)\S*/
+    const i = e.test(t)
+    return i ? 'https://m.weibo.cn/api/scheme?scheme='.concat(encodeURIComponent(t)) : t
 }
 
-function transUrl(input, url_struct) {
-    let urlExpr = /(http|https):\/\/([\w.]+\/?)\S*/
-        , result = '<a class="bk-link" target="_blank"';
-    if (!urlExpr.test(input))
-        return input;
-    var u = /^http:\/\/t\.cn/;
-    u.test(input) && (input = input.replace(/http:/, "https:")),
-        result += ' href="'.concat(input, '"><img class="bk-icon-link" src="https://h5.sinaimg.cn/upload/2015/09/25/3/timeline_card_small_web_default.png"/>网页链接</a>')
+function transUrl(input /*, urlStruct */) {
+    const urlExpr = /(http|https):\/\/([\w.]+\/?)\S*/
+    let result = '<a class="bk-link" target="_blank"'
+    if (!urlExpr.test(input)) { return input }
+    const u = /^http:\/\/t\.cn/
+    u.test(input) && (input = input.replace(/http:/, 'https:'))
+    result += ' href="'.concat(input, '"><img class="bk-icon-link" src="https://h5.sinaimg.cn/upload/2015/09/25/3/timeline_card_small_web_default.png"/>网页链接</a>')
     return result
 }
 
-function transTopic(t, topic_struct) {
-    var i = t && t.slice(1, -1)
-        , a = topic_struct && topic_struct.find((function (t) {
-            return t.topic_title === i && 1 === t.is_invalid
-        }));
-    if (a)
-        return t;
-    var o = "", n = "";
-    return (o = "https://s.weibo.com/weibo?q=".concat(encodeURIComponent(t)),
-        n = "_blank"),
-        '<a class ="bk-link" href="'.concat(o, '" target="').concat(n, '">').concat(t, "</a>")
+function transTopic(t, topicStruct) {
+    const i = t && t.slice(1, -1)
+    const a = topicStruct && topicStruct.find(function (t) {
+        return t.topic_title === i && t.is_invalid === 1
+    })
+    if (a) { return t }
+    const o = 'https://s.weibo.com/weibo?q='.concat(encodeURIComponent(t))
+    const n = '_blank'
+    return '<a class ="bk-link" href="'.concat(o, '" target="').concat(n, '">').concat(t, '</a>')
 }
 
 function transUser(t) {
-    var e = t.slice(1);
-    return e ? "<a class='bk-user' href=https://weibo.com/n/".concat(e, ">").concat(t, "</a>") : t
+    const e = t.slice(1)
+    return e ? '<a class="bk-user" href=https://weibo.com/n/'.concat(e, '>').concat(t, '</a>') : t
 }
 
 function transBr() {
-    return "<br />"
+    return '<br />'
 }
 
 function transEmoji(t, storage) {
-    let location = getEmoji(t, storage);
-    let o = t.slice(1, -1);
+    const location = getEmoji(t, storage)
+    const o = t.slice(1, -1)
     return location ? '<img class="bk-emoji" alt="['.concat(o, ']" title="[').concat(o, ']" src="').concat(location, '" />') : t
 }
 
 async function fetchEmoticon() {
-    let api = STATUSES_CONFIG_API;
-    let res = await fetch(api, globalConfig.httpInit);
-    let rawEmoticon = (await res.json()).data.emoticon;
-    console.assert(void 0 !== rawEmoticon);
+    const api = STATUSES_CONFIG_API
+    const res = await fetch(api, globalConfig.httpInit)
+    const rawEmoticon = (await res.json()).data.emoticon
+    console.assert(rawEmoticon !== undefined)
 
-    let emoticon = new Map();
+    const emoticon = new Map()
     for (const lang in rawEmoticon) {
         // v: {哆啦A梦:{}, 其它:{}...}
-        let emojiSets = rawEmoticon[lang];
+        const emojiSets = rawEmoticon[lang]
         for (const setName in emojiSets) {
             for (const obj of emojiSets[setName]) {
-                emoticon.set(obj.phrase, obj.url);
+                emoticon.set(obj.phrase, obj.url)
             }
         }
     }
-    globalConfig.emoticon = emoticon;
+    globalConfig.emoticon = emoticon
 }
 
 function getEmoji(e, storage) {
-    let emoticon = globalConfig.emoticon;
-    if (void 0 === emoticon) {
-        return '';
+    const emoticon = globalConfig.emoticon
+    if (emoticon === undefined) {
+        return ''
     }
-    let url = emoticon.get(e);
+    const url = emoticon.get(e)
     if (url) {
-        return url2path(url, storage);
+        return url2path(url, storage)
     } else {
-        return '';
+        return ''
     }
 }
 
 function getFilename(url) {
-    return url.split('/').slice(-1)[0].split('?')[0];
+    return url.split('/').slice(-1)[0].split('?')[0]
 }
 
 function url2path(url, storage) {
-    let fileName = getFilename(url);
-    let filePath = `./${storage.taskName}_files/` + fileName;
-    if (void 0 === storage.resourceMap.get(url)) {
-        storage.resourceMap.set(url, { fileName: fileName, saved: false });
+    const fileName = getFilename(url)
+    const filePath = `./${storage.taskName}_files/` + fileName
+    if (storage.resourceMap.get(url) === undefined) {
+        storage.resourceMap.set(url, { fileName, saved: false })
     }
-    return filePath;
+    return filePath
 }
