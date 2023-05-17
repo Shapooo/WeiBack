@@ -69,7 +69,7 @@ async function fetchAllPosts(type = 'myblog', range) {
         })))
 
         page++
-        if (noMore) break
+        if (noMore || index === range[1]) break
         await new Promise((resolve) => {
             setTimeout(resolve, 8 * 1000)
         })
