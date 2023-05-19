@@ -1,7 +1,7 @@
 const HTML_GEN_TEMP = '<html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{background-color:#f1f2f5}.bk-post-wrapper{border-radius:4px;background:#fff;width:700px;margin:8px auto;padding:10px 0}.bk-poster{display:flex;align-items:center;vertical-align:middle;height:60px}.bk-poster-avatar,.bk-retweeter-avatar{height:60px;width:60px;border-radius:50%;margin:auto 8px}.bk-retweeter-avatar{height:40px;width:40px}.bk-post-text{background:#fff}.bk-content{margin:8px 24px 8px 76px;font-size:15px;line-height:24px}.bk-retweeter{display:flex;align-items:center;vertical-align:middle;height:40px;margin:8px 24px 8px 76px}.bk-retweet{background:#f9f9f9;padding:2px 0}.bk-pic{max-width:600px;max-height:400px;margin:auto}.bk-poster-name,.bk-retweeter-name{color:#000;font-weight:700;text-decoration:none;font-family:Arial,Helvetica,sans-serif}.bk-poster-name:hover,.bk-retweeter-name:hover{color:#eb7350}.bk-icon-link{height:20px;filter:sepia(100%) saturate(3800%) contrast(75%);vertical-align:middle;margin-bottom:4px}.bk-link,.bk-user{color:#eb7350;text-decoration:none}.bk-link:hover,.bk-user:hover{text-decoration:underline}.bk-emoji{height:20px;vertical-align:middle;margin-bottom:4px}.bk-create-detail{font-size:10px;color:#939393}</style><title>微博备份</title></head><body></body></html>'
 
 async function generateHTMLPage(posts, storage) {
-    return (await Promise.all(posts.map((post) => generateHTMLPost(post, storage)))).join('')
+    return Promise.all(posts.map((post) => generateHTMLPost(post, storage))).then(posts => posts.join(''))
 }
 
 function composePost(postMeta, isRetweet = false) {
@@ -236,9 +236,10 @@ function getFilename(url) {
 
 function url2path(url, storage) {
     const fileName = getFilename(url)
-    const filePath = `./${storage.taskName}_files/` + fileName
+    const filePath = `./${storage.taskName}-${storage.index}_files/` + fileName
     if (storage.resourceMap.get(url) === undefined) {
-        storage.resourceMap.set(url, { fileName, saved: false })
+        storage.resourceMap.set(url, { fileName, blob: undefined })
     }
+    storage.resources.add(url)
     return filePath
 }

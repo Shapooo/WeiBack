@@ -26,20 +26,26 @@ async function fetchAllPosts(type = 'myblog', range) {
     const storage = {
         resourceMap: new Map(),
         taskName: `WeiBack-${type}-${Date.now()}`,
-        resources: []
+        resources: new Set(),
+        index: 1
     }
     await fetchEmoticon()
 
     const uid = globalConfig.uid
-    const allPageData = []
-    let page = 1
+    const downloadPerid = 10
+    let allPageData = []
     let noMore = false
-    for (let index = range[0]; index <= range[1]; index++) {
+    let index = 0
+    const zip = new JSZip()
+    const name = storage.taskName
+    const rootFolder = zip.folder(name)
+    for (let page = range[0]; page <= range[1]; page++) {
         console.log('scan', 'page', page)
         showTip(`正在备份第 ${page} 页<br>因微博速率限制，过程可能较长，先干点别的吧`)
         let data
-        for (let index = 0; index < 10; index++) {
+        for (let i = 0; i < 10; i++) {
             const pageData = await fetchPostMeta(uid, page, type)
+            console.log('pagedata', pageData)
             if (pageData.ok) {
                 data = type === 'fav' ? pageData.data.status : pageData.data.list
                 if (data.length === 0) noMore = true
@@ -48,44 +54,47 @@ async function fetchAllPosts(type = 'myblog', range) {
             await new Promise((resolve) => {
                 setTimeout(resolve, 8 * 1000)
             })
-            console.log('retry', index)
+            console.log('retry', i)
             showTip(
-                `[重试]备份第 ${page} 页，错误内容： ${JSON.stringify(pageData)}`
+                `[重试]备份第 ${index} 页，错误内容： ${JSON.stringify(pageData)}`
             )
         }
 
         allPageData.push(await generateHTMLPage(data, storage))
-        const picToFetch = []
-        storage.resourceMap.forEach((v, url) => {
-            if (!v.saved) {
-                picToFetch.push([url, v.fileName])
+        await Promise.all(Array.from(storage.resources).map((url) => {
+            let item = storage.resourceMap.get(url)
+            if (item.blob === undefined) {
+                return fetchPic(url).then((blob) => {
+                    storage.resourceMap.set(url, { fileName: item.fileName, blob })
+                })
+            } else {
+                return Promise.resolve()
             }
-        })
-        storage.resources = storage.resources.concat(await Promise.all(picToFetch.map((picItem) => {
-            return fetchPic(picItem[0]).then((blob) => {
-                storage.resourceMap.set(picItem[0], { fileName: picItem[1], saved: true })
-                return [picItem[1], blob]
-            })
-        })))
+        }))
 
-        page++
-        if (noMore || index === range[1]) break
+        index++
+        if (index % downloadPerid == 0 || page == range[1] || noMore) {
+            const taskName = `${name}-${storage.index}`
+            storage.index++
+            const doc = (new DOMParser()).parseFromString(HTML_GEN_TEMP, 'text/html')
+            doc.body.innerHTML = allPageData.join('')
+            allPageData = []
+            rootFolder.file(taskName + '.html', doc.documentElement.outerHTML)
+            const resources = rootFolder.folder(taskName + '_files')
+            storage.resources.forEach((url) => {
+                let item = storage.resourceMap.get(url)
+                resources.file(item.fileName, item.blob, { base64: true })
+            })
+            storage.resources.clear()
+        }
+
+        if (noMore || page === range[1]) break
         await new Promise((resolve) => {
             setTimeout(resolve, 8 * 1000)
         })
     }
 
     showTip('数据拉取完成，等待下载到本地')
-    const name = storage.taskName
-    const doc = (new DOMParser()).parseFromString(HTML_GEN_TEMP, 'text/html')
-    doc.body.innerHTML = allPageData.join('')
-    const zip = new JSZip()
-    zip.file(name + '.html', doc.documentElement.outerHTML)
-    const resources = zip.folder(name + '_files')
-
-    storage.resources.forEach((item) => {
-        resources.file(item[0], item[1], { base64: true })
-    })
 
     zip.generateAsync({ type: 'blob' }).then(function (content) {
         saveAs(content, name + '.zip')
