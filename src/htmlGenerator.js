@@ -34,16 +34,10 @@ function composePost(postMeta, isRetweet = false) {
     textDiv.className = prefix + '-text bk-content'
     textDiv.innerHTML = postMeta.text
     postDiv.appendChild(textDiv)
-    if (postMeta.pics) {
+    if (postMeta.medium) {
         const mediaDiv = document.createElement('div')
         mediaDiv.className = prefix + '-media bk-content'
-        postMeta.pics.forEach(element => {
-            const pic = document.createElement('img')
-            pic.className = 'bk-pic'
-            pic.alt = '[图片]'
-            pic.src = element
-            mediaDiv.appendChild(pic)
-        })
+        mediaDiv.innerHTML = postMeta.medium.join('')
         postDiv.appendChild(mediaDiv)
     }
     if (postMeta.postUrl) {
@@ -66,25 +60,47 @@ async function generateHTMLPost(post, storage) {
     return wrapper.outerHTML
 }
 
-function picId2Location(id, post, storage) {
-    if (post.pic_infos) {
-        return url2path(post.pic_infos[id].large.url, storage)
-    } else if (post.mix_media_info) {
-        for (const item of post.mix_media_info.items) {
-            if (item.type === 'pic' && item.id === id) {
-                return url2path(item.data.largest.url, storage)
+function getMedium(post, storage) {
+    if (post.mix_media_info) {
+        post.mix_media_info.map(item => {
+            const data = item.data
+            if (item.type === 'pic') {
+                const pic = document.createElement('img')
+                pic.className = 'bk-pic'
+                pic.alt = '[图片]'
+                pic.src = item.data.large.url
+                return pic.outerHTML
+            } else if (item.type === 'video') {
+                const video = document.createElement('a')
+                video.className = 'bk-link'
+                video.innerHTML = data.page_title
+                video.href = data.media_info && data.media_info.h5_url
+                const pic = document.createElement('img')
+                pic.className = 'bk-pic'
+                pic.alt = '[视频]'
+                pic.src = url2path(data.page_pic, storage)
+                video.appendChild(pic)
+                return video.outerHTML
+            } else {
+                return ''
             }
-        }
+        })
+    } else if (post.pic_ids && post.pic_infos) {
+        return post.pic_ids.map(id => url2path(post.pic_infos[id].large.url, storage)).map((loc) => {
+            const pic = document.createElement('img')
+            pic.className = 'bk-pic'
+            pic.alt = '[图片]'
+            pic.src = loc
+            return pic.outerHTML
+        })
     } else {
-        return ''
+        return []
     }
 }
 
 async function parsePost(post, storage) {
     const text = await transText(post.isLongText ? await fetchLongText(post.mblogid) : post.text_raw,
         post.topic_struct, post.url_struct, storage)
-    const pics = post.pic_ids && post.pic_ids.map((id) => picId2Location(id, post, storage))
-    const videos = []
     return {
         posterName: post.user && post.user.screen_name,
         posterUrl: post.user && 'https://weibo.com' + post.user.profile_url,
@@ -94,8 +110,7 @@ async function parsePost(post, storage) {
         mblogid: post.mblogid,
         createdAt: post.created_at,
         regionName: post.region_name,
-        pics,
-        videos
+        medium: getMedium(post, storage)
     }
 }
 
