@@ -40,7 +40,6 @@ async function fetchAllPosts(type = 'myblog', range) {
         let data
         for (let i = 0; i < 10; i++) {
             const pageData = await fetchPostMeta(uid, page, type)
-            console.log('pagedata', pageData)
             if (pageData.ok) {
                 data = type === 'fav' ? pageData.data : pageData.data.list
                 if (data.length === 0) noMore = true

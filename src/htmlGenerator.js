@@ -130,7 +130,7 @@ async function transText(text, topicStruct, urlStruct, storage) {
         text = text.replace(r, function (e) {
             if (e) {
                 const o = e.slice(0, 1)
-                return e === '\n' ? transBr() : o === 'h' || urlStruct ? transUrl(e, urlStruct, topicStruct) : e
+                return e === '\n' ? transBr() : o === 'h' || urlStruct ? transUrl(e, urlStruct) : e
             }
         }),
         text = text.replace(atExpr, function (e) {
@@ -162,14 +162,23 @@ function resetUrl(t) {
     return i ? 'https://m.weibo.cn/api/scheme?scheme='.concat(encodeURIComponent(t)) : t
 }
 
-function transUrl(input /*, urlStruct */) {
+function transUrl(input, urlStruct) {
+    const urlObj = urlStruct && urlStruct.find((function (e) {
+        return e.short_url === input
+    }))
     const urlExpr = /(http|https):\/\/([\w.]+\/?)\S*/
-    let result = '<a class="bk-link" target="_blank"'
     if (!urlExpr.test(input)) { return input }
     const u = /^http:\/\/t\.cn/
     u.test(input) && (input = input.replace(/http:/, 'https:'))
-    result += ' href="'.concat(input, '"><img class="bk-icon-link" src="https://h5.sinaimg.cn/upload/2015/09/25/3/timeline_card_small_web_default.png"/>网页链接</a>')
-    return result
+    let urlTitle = '网页链接'
+    let url = input
+    if (urlObj && urlObj.url_title) {
+        urlTitle = urlObj.url_title
+    }
+    if (urlObj && urlObj.long_url) {
+        url = urlObj.long_url
+    }
+    return `<a class="bk-link" target="_blank" href="${url}"><img class="bk-icon-link" src="https://h5.sinaimg.cn/upload/2015/09/25/3/timeline_card_small_web_default.png"/>${urlTitle}</a>`
 }
 
 function transTopic(t, topicStruct) {
