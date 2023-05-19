@@ -1,17 +1,12 @@
-async function fetchMyContent(page = 1, type = 'myblog') {
-    const uid = globalConfig.uid
-    return await fetchPostMeta(uid, page, type)
-}
-
 async function fetchPostMeta(uid = 0, page = 1, type = 'myblog') {
-    let api = `${STATUSES_MY_MICRO_BLOG_API}?uid=${uid}&page=${page}&feature=0&with_total=true`
+    let api = `${STATUSES_MY_MICRO_BLOG_API}?uid=${uid}&page=${page}&feature=0`
 
     if (type === 'fav') {
-        api = `${FAVORITES_ALL_FAV_API}?uid=${uid}&page=${page}&with_total=true`
+        api = `${FAVORITES_ALL_FAV_API}?uid=${uid}&page=${page}`
     }
 
     if (type === 'like') {
-        api = `${STATUSES_LIKE_LIST_API}?uid=${uid}&page=${page}&with_total=true`
+        api = `${STATUSES_LIKE_LIST_API}?uid=${uid}&page=${page}`
     }
 
     console.log(`request ${api}`)
@@ -47,7 +42,7 @@ async function fetchAllPosts(type = 'myblog', range) {
             const pageData = await fetchPostMeta(uid, page, type)
             console.log('pagedata', pageData)
             if (pageData.ok) {
-                data = type === 'fav' ? pageData.data.status : pageData.data.list
+                data = type === 'fav' ? pageData.data : pageData.data.list
                 if (data.length === 0) noMore = true
                 break
             }

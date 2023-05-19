@@ -134,15 +134,20 @@ async function getPageAmount(type) {
     if (type === 'like') {
         return Infinity
     }
-    const data = (await fetchMyContent(1, type)).data
-    let amount = 0
     if (type === 'fav') {
-        amount = data.total_number
-    } else {
-        amount = data.total
+        const req = await fetch(FAVORITES_TAGS_API, globalConfig.httpInit)
+        const json = await req.json()
+        return json && json.ok && Math.ceil(json.fav_total_num / 20)
     }
-    return Math.ceil(amount / 20)
+    const req = await fetch(`${PROFILE_INFO_API}?uid=${globalConfig.uid}`, globalConfig.httpInit)
+    const json = await req.json()
+    return json && json.ok && Math.ceil(json.data.user.statuses_count / 20)
 }
+async function fetchMyContent(page = 1, type = 'myblog') {
+    const uid = globalConfig.uid
+    return await fetchPostMeta(uid, page, type)
+}
+
 
 function showTip(msg) {
     bkBoxTip.innerHTML = msg
