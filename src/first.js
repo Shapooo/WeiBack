@@ -5,7 +5,7 @@
 // @description  微博数据下载备份
 // @author       Shapooo
 // @homepageURL  https://github.com/Shapooo/WeiBack
-// @match        *://weibo.com/*
+// @match        *://*.weibo.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=weibo.com
 // @grant        none
 // @license      GPL

@@ -10,7 +10,7 @@ async function fetchPostMeta(uid = 0, page = 1, type = 'myblog') {
     }
 
     console.log(`request ${api}`)
-    const req = await fetch(api, globalConfig.httpInit())
+    const req = await fetch(api)
     const data = await req.json()
     return data
 }
@@ -101,6 +101,6 @@ async function fetchAllPosts(type = 'myblog', range) {
 }
 
 async function fetchPic(url) {
-    const res = await fetch(url, globalConfig.httpInit)
+    const res = await fetch(url)
     return (await res.blob())
 }

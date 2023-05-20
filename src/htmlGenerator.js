@@ -116,7 +116,7 @@ async function parsePost(post, storage) {
 
 async function fetchLongText(mblogid) {
     const api = `${STATUSES_LONGTEXT_API}?id=${mblogid}`
-    const res = await fetch(api, globalConfig.httpInit)
+    const res = await fetch(api)
     const longText = (await res.json()).data.longTextContent
     return longText
 }
@@ -224,7 +224,7 @@ function transEmoji(t, storage) {
 
 async function fetchEmoticon() {
     const api = STATUSES_CONFIG_API
-    const res = await fetch(api, globalConfig.httpInit)
+    const res = await fetch(api)
     const rawEmoticon = (await res.json()).data.emoticon
     console.assert(rawEmoticon !== undefined)
 

@@ -6,38 +6,17 @@ const TITLE_PIC = '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKkAA
 
 const BKBOX_TEMP = `<div class='bkBox-title'>${TITLE_PIC}</div><nav><div class='navi'></div></nav><section><div class='box'></div></section>`
 
-const STATUSES_CONFIG_API = 'https://weibo.com/ajax/statuses/config'
-const STATUSES_MY_MICRO_BLOG_API = 'https://weibo.com/ajax/statuses/mymblog'
-const STATUSES_LONGTEXT_API = 'https://weibo.com/ajax/statuses/longtext'
-const STATUSES_LIKE_LIST_API = 'https://weibo.com/ajax/statuses/likelist'
-const FAVORITES_ALL_FAV_API = 'https://weibo.com/ajax/favorites/all_fav'
-const FAVORITES_TAGS_API = 'https://weibo.com/ajax/favorites/tags?page=1&is_show_total=1'
-const PROFILE_INFO_API = 'https://weibo.com/ajax/profile/info'
+const domain = window.location.host
+const STATUSES_CONFIG_API = `https://${domain}/ajax/statuses/config`
+const STATUSES_MY_MICRO_BLOG_API = `https://${domain}/ajax/statuses/mymblog`
+const STATUSES_LONGTEXT_API = `https://${domain}/ajax/statuses/longtext`
+const STATUSES_LIKE_LIST_API = `https://${domain}/ajax/statuses/likelist`
+const FAVORITES_ALL_FAV_API = `https://${domain}/ajax/favorites/all_fav`
+const FAVORITES_TAGS_API = `https://${domain}/ajax/favorites/tags?page=1&is_show_total=1`
+const PROFILE_INFO_API = `https://${domain}/ajax/profile/info`
 
 const globalConfig = {
-    uid: $CONFIG.uid,
-    httpInit: () => {
-        return {
-            headers: {
-                accept: 'application/json, text/plain, */*',
-                'accept-language': 'zh-CN,zh;q=0.9,en-IN;q=0.8,en;q=0.7,ar;q=0.6',
-                'sec-ch-ua':
-                    '" Not A;Brand";v="99", "Chromium";v="101", "Google Chrome";v="101"',
-                'sec-ch-ua-mobile': '?0',
-                'sec-ch-ua-platform': '"macOS"',
-                'sec-fetch-dest': 'empty',
-                'sec-fetch-mode': 'cors',
-                'sec-fetch-site': 'same-origin',
-                'x-requested-with': 'XMLHttpRequest'
-            },
-            referrer: `https://weibo.com/u/${this.uid}`,
-            referrerPolicy: 'strict-origin-when-cross-origin',
-            body: null,
-            method: 'GET',
-            mode: 'cors',
-            credentials: 'include'
-        }
-    }
+    uid: $CONFIG.uid
 }
 
 const TT = (type, name) => {
@@ -135,11 +114,11 @@ async function getPageAmount(type) {
         return Infinity
     }
     if (type === 'fav') {
-        const req = await fetch(FAVORITES_TAGS_API, globalConfig.httpInit)
+        const req = await fetch(FAVORITES_TAGS_API)
         const json = await req.json()
         return json && json.ok && Math.ceil(json.fav_total_num / 20)
     }
-    const req = await fetch(`${PROFILE_INFO_API}?uid=${globalConfig.uid}`, globalConfig.httpInit)
+    const req = await fetch(`${PROFILE_INFO_API}?uid=${globalConfig.uid}`)
     const json = await req.json()
     return json && json.ok && Math.ceil(json.data.user.statuses_count / 20)
 }
