@@ -125,8 +125,7 @@ async function transText(text, topicStruct, urlStruct, storage) {
     const o = {
         url: '(http|https)://[a-zA-Z0-9$%&~_#/.\\-:=,?]{5,280}',
         stock: '\\$([^\\$]+)\\$',
-        br: '\\n',
-        singleQuote: '(&|&amp)#39'
+        br: '\\n'
     }
     const atExpr = /@[\u4e00-\u9fa5|\uE7C7-\uE7F3|\w_\-·]+/g // at id
     const emojiExpr = /(\[.*?\])(?!#)/g // emoji
@@ -141,7 +140,6 @@ async function transText(text, topicStruct, urlStruct, storage) {
         }
         return t
     }),
-        text = text.replace(/&#39/g, '"'),
         text = text.replace(r, function (e) {
             if (e) {
                 const o = e.slice(0, 1)
