@@ -67,9 +67,14 @@ Promise.all(bkTypes).then((values) => {
                 btn.addEventListener('click', async () => {
                     const dlRange_ = page.querySelectorAll('input')
                     const dlRange = [dlRange_[0].value, dlRange_[1].value]
-                    hideAllButton()
-                    await fetchAllPosts(type, dlRange)
-                    showAllButton()
+                    try {
+                        hideAllButton()
+                        await fetchAllPosts(type, dlRange)
+                        showAllButton()
+                    } catch (err) {
+                        showTip('程序崩了，原因: ', err)
+                        console.error(err)
+                    }
                 })
                 return page
             })()
