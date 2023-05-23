@@ -56,19 +56,20 @@ async function fetchAllPosts(type = 'myblog', range) {
         }
 
         allPageData.push(await generateHTMLPage(data, storage))
-        await Promise.all(Array.from(storage.picUrls).map((url) => {
+        for (const url of storage.picUrls) {
+            if (resources.get(url)) {
+                continue
+            }
             let blob = storage.cache.get(url)
             if (blob) {
                 resources.set(url, blob)
-                return Promise.resolve()
             } else {
-                return fetchPic(url).then((blob) => {
-                    storage.cache.set(url, blob)
-                    resources.set(url, blob)
-                    return Promise.resolve()
-                })
+                let blob = await fetchPic(url)
+                storage.cache.set(url, blob)
+                resources.set(url, blob)
             }
-        }))
+        }
+        storage.picUrls.clear()
 
         index++
         if (index % downloadPerid == 0 || page == range[1] || noMore) {
