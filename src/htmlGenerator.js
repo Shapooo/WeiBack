@@ -99,8 +99,8 @@ function getMedium(post, storage) {
 }
 
 async function parsePost(post, storage) {
-    const text = await transText(post.isLongText ? await fetchLongText(post.mblogid) : post.text_raw,
-        post.topic_struct, post.url_struct, storage)
+    let text = post.isLongText ? await fetchLongText(post.mblogid) : post.text_raw
+    text = await transText(text ? text : post.text_raw, post.topic_struct, post.url_struct, storage)
     return {
         posterName: post.user && post.user.screen_name,
         posterUrl: post.user && 'https://weibo.com' + post.user.profile_url,
