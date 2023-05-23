@@ -106,7 +106,7 @@ async function parsePost(post, storage) {
         posterUrl: post.user && 'https://weibo.com' + post.user.profile_url,
         posterAvatar: post.user && post.user.avatar_hd && url2path(post.user.avatar_hd, storage),
         text,
-        postUrl: post.user && `https://weibo.com/${post.user.idstr}/${post.mblogid}`,
+        postUrl: post.user && post.user.avatar_large && `https://weibo.com/${post.user.idstr}/${post.mblogid}`,
         mblogid: post.mblogid,
         createdAt: post.created_at,
         regionName: post.region_name,
