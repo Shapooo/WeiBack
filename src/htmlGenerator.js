@@ -100,7 +100,7 @@ function getMedium(post, storage) {
 
 async function parsePost(post, storage) {
     let text = post.isLongText ? await fetchLongText(post.mblogid) : post.text_raw
-    text = await transText(text ? text : post.text_raw, post.topic_struct, post.url_struct, storage)
+    text = await transText(text || post.text_raw, post.topic_struct, post.url_struct, storage)
     return {
         posterName: post.user && post.user.screen_name,
         posterUrl: post.user && 'https://weibo.com' + post.user.profile_url,
@@ -169,16 +169,10 @@ function isSuperTopic(input, urlStruct) {
     })
 }
 
-function resetUrl(t) {
-    const e = /sinaweibo:\/\/([\w.]+\/?)\S*/
-    const i = e.test(t)
-    return i ? 'https://m.weibo.cn/api/scheme?scheme='.concat(encodeURIComponent(t)) : t
-}
-
 function transUrl(input, urlStruct) {
-    const urlObj = urlStruct && urlStruct.find((function (e) {
+    const urlObj = urlStruct && urlStruct.find(function (e) {
         return e.short_url === input
-    }))
+    })
     const urlExpr = /(http|https):\/\/([\w.]+\/?)\S*/
     if (!urlExpr.test(input)) { return input }
     const u = /^http:\/\/t\.cn/

@@ -34,7 +34,7 @@ async function fetchAllPosts(type = 'myblog', range) {
     const zip = new JSZip()
     const name = storage.taskName
     const rootFolder = zip.folder(name)
-    let resources = new Map()
+    const resources = new Map()
     for (let page = range[0]; page <= range[1]; page++) {
         console.log('scan', 'page', page)
         showTip(`正在备份第 ${page} 页<br>因微博速率限制，过程可能较长，先干点别的吧`)
@@ -60,11 +60,11 @@ async function fetchAllPosts(type = 'myblog', range) {
             if (resources.get(url)) {
                 continue
             }
-            let blob = storage.cache.get(url)
+            const blob = storage.cache.get(url)
             if (blob) {
                 resources.set(url, blob)
             } else {
-                let blob = await fetchPic(url)
+                const blob = await fetchPic(url)
                 storage.cache.set(url, blob)
                 resources.set(url, blob)
             }
@@ -72,7 +72,7 @@ async function fetchAllPosts(type = 'myblog', range) {
         storage.picUrls.clear()
 
         index++
-        if (index % downloadPerid == 0 || page == range[1] || noMore) {
+        if (index % downloadPerid === 0 || page === range[1] || noMore) {
             const taskName = `${name}-${storage.index}`
             storage.index++
             const doc = (new DOMParser()).parseFromString(HTML_GEN_TEMP, 'text/html')
@@ -112,7 +112,7 @@ async function fetchPic(url) {
         } catch (err) {
             console.log('fic fetch occurs: ', err)
             await new Promise((resolve) => {
-                setTimeout(resolve, i * 300);
+                setTimeout(resolve, i * 300)
             })
         }
     }

@@ -127,11 +127,6 @@ async function getPageAmount(type) {
     const json = await req.json()
     return json && json.ok && Math.ceil(json.data.user.statuses_count / 20)
 }
-async function fetchMyContent(page = 1, type = 'myblog') {
-    const uid = globalConfig.uid
-    return await fetchPostMeta(uid, page, type)
-}
-
 
 function showTip(msg) {
     bkBoxTip.innerHTML = msg
