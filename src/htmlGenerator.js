@@ -62,7 +62,7 @@ async function generateHTMLPost(post, storage) {
 
 function getMedium(post, storage) {
     if (post.mix_media_info) {
-        post.mix_media_info.map(item => {
+        post.mix_media_info.items.map(item => {
             const data = item.data
             if (item.type === 'pic') {
                 const pic = document.createElement('img')
