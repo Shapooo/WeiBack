@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         微博备份
 // @namespace    https://github.com/Shapooo/
-// @version      0.3
+// @version      0.4
 // @description  微博数据下载备份
 // @author       Shapooo
 // @homepageURL  https://github.com/Shapooo/WeiBack
@@ -15,5 +15,10 @@
 // @note         2023-05-20 0.3 优化链接显示标题
 // @note         2023-05-20 0.3 增加对图片、视频混合型微博支持
 // @note         2023-05-20 0.3 增加对 www.weibo.com 的支持
+// @note         2023-05-22 0.4 本地图片缓存添加 lru 算法
+// @note         2023-05-23 0.4 将图片获取变为串行，减小下载连接被 reset 的可能性
+// @note         2023-05-23 0.4 为图片下载增加了重试机制
+// @note         2023-05-23 0.4 增加了备份失败时的提示，方便用户反馈问题
+// @note         2023-05-23 0.4 修复若干问题
 // ==/UserScript==
 "use strict";
