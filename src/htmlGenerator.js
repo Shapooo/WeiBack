@@ -109,7 +109,7 @@ async function parsePost(post, storage) {
         postUrl: post.user && post.user.avatar_large && `https://weibo.com/${post.user.idstr}/${post.mblogid}`,
         mblogid: post.mblogid,
         createdAt: post.created_at,
-        regionName: post.region_name,
+        regionName: post.region_name ? post.region_name : '',
         medium: getMedium(post, storage)
     }
 }
