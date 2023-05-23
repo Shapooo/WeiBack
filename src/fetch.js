@@ -104,6 +104,16 @@ async function fetchAllPosts(type = 'myblog', range) {
 }
 
 async function fetchPic(url) {
-    const res = await fetch(url)
-    return (await res.blob())
+    for (let i = 0; i < 5; ++i) {
+        try {
+            const res = await fetch(url)
+            return (await res.blob())
+        } catch (err) {
+            console.log('fic fetch occurs: ', err)
+            await new Promise((resolve) => {
+                setTimeout(resolve, i * 300);
+            })
+        }
+    }
+    console.log(`pic ${url} download failed`)
 }
