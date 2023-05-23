@@ -259,9 +259,6 @@ function getFilename(url) {
 function url2path(url, storage) {
     const fileName = getFilename(url)
     const filePath = `./${storage.taskName}-${storage.index}_files/` + fileName
-    if (storage.resourceMap.get(url) === undefined) {
-        storage.resourceMap.set(url, { fileName, blob: undefined })
-    }
-    storage.resources.add(url)
+    storage.picUrls.add(url)
     return filePath
 }

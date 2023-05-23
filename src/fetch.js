@@ -19,9 +19,9 @@ async function fetchAllPosts(type = 'myblog', range) {
     console.log(`fetching ${type} post ${range}`)
 
     const storage = {
-        resourceMap: new Map(),
+        cache: new LRUCache(200),
         taskName: `WeiBack-${type}-${Date.now()}`,
-        resources: new Set(),
+        picUrls: new Set(),
         index: 1
     }
     await fetchEmoticon()
@@ -34,6 +34,7 @@ async function fetchAllPosts(type = 'myblog', range) {
     const zip = new JSZip()
     const name = storage.taskName
     const rootFolder = zip.folder(name)
+    let resources = new Map()
     for (let page = range[0]; page <= range[1]; page++) {
         console.log('scan', 'page', page)
         showTip(`正在备份第 ${page} 页<br>因微博速率限制，过程可能较长，先干点别的吧`)
@@ -55,14 +56,17 @@ async function fetchAllPosts(type = 'myblog', range) {
         }
 
         allPageData.push(await generateHTMLPage(data, storage))
-        await Promise.all(Array.from(storage.resources).map((url) => {
-            let item = storage.resourceMap.get(url)
-            if (item.blob === undefined) {
-                return fetchPic(url).then((blob) => {
-                    storage.resourceMap.set(url, { fileName: item.fileName, blob })
-                })
-            } else {
+        await Promise.all(Array.from(storage.picUrls).map((url) => {
+            let blob = storage.cache.get(url)
+            if (blob) {
+                resources.set(url, blob)
                 return Promise.resolve()
+            } else {
+                return fetchPic(url).then((blob) => {
+                    storage.cache.set(url, blob)
+                    resources.set(url, blob)
+                    return Promise.resolve()
+                })
             }
         }))
 
@@ -74,17 +78,16 @@ async function fetchAllPosts(type = 'myblog', range) {
             doc.body.innerHTML = allPageData.join('')
             allPageData = []
             rootFolder.file(taskName + '.html', doc.documentElement.outerHTML)
-            const resources = rootFolder.folder(taskName + '_files')
-            storage.resources.forEach((url) => {
-                let item = storage.resourceMap.get(url)
-                resources.file(item.fileName, item.blob, { base64: true })
+            const resourcesFolder = rootFolder.folder(taskName + '_files')
+            resources.forEach((blob, url) => {
+                resourcesFolder.file(getFilename(url), blob, { base64: true })
             })
-            storage.resources.clear()
+            resources.clear()
         }
 
         if (noMore || page === range[1]) break
         await new Promise((resolve) => {
-            setTimeout(resolve, 8 * 1000)
+            setTimeout(resolve, 10 * 1000)
         })
     }
 
