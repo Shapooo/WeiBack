@@ -69,7 +69,11 @@ Promise.all(bkTypes).then((values) => {
                     const input = page.querySelectorAll('input')
                     const dlRange = [parseInt(input[0].value), parseInt(input[1].value)]
                     downloadPerid = parseInt(input[2].value)
+                    downloadPerid = downloadPerid > 20 ? 20 : downloadPerid
+                    downloadPerid = downloadPerid < 1 ? 1 : downloadPerid
                     imageDefinition = parseInt(input[3].value)
+                    imageDefinition = imageDefinition > 3 ? 3 : imageDefinition
+                    imageDefinition = imageDefinition < 1 ? 1 : imageDefinition
                     try {
                         hideAllButton()
                         await fetchAllPosts(type, dlRange)
