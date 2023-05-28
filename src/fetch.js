@@ -27,7 +27,8 @@ async function fetchAllPosts(type = 'myblog', range) {
     await fetchEmoticon()
 
     const uid = globalConfig.uid
-    const downloadPerid = 10
+    downloadPerid = downloadPerid || 10
+    console.log('d', downloadPerid)
     let allPageData = []
     let noMore = false
     let index = 0
@@ -72,6 +73,8 @@ async function fetchAllPosts(type = 'myblog', range) {
         storage.picUrls.clear()
 
         index++
+        console.log('range[1]', range[1], 'index', index, 'page', page, 'nomore', noMore, 'index%dp', index % downloadPerid, 'page=range[1]', page === range[1])
+        console.log(typeof range[1], typeof page)
         if (index % downloadPerid === 0 || page === range[1] || noMore) {
             const taskName = `${name}-${storage.index}`
             storage.index++
