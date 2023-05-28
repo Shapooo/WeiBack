@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         微博备份
 // @namespace    https://github.com/Shapooo/
-// @version      0.4
+// @version      0.5
 // @description  微博数据下载备份
 // @author       Shapooo
 // @homepageURL  https://github.com/Shapooo/WeiBack
@@ -20,5 +20,8 @@
 // @note         2023-05-23 0.4 为图片下载增加了重试机制
 // @note         2023-05-23 0.4 增加了备份失败时的提示，方便用户反馈问题
 // @note         2023-05-23 0.4 修复若干问题
+// @note         2023-05-28 0.5 修复若干问题
+// @note         2023-05-28 0.5 增加分段下载设置功能
+// @note         2023-05-28 0.5 增加图片大小设置功能
 // ==/UserScript==
 "use strict";
