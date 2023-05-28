@@ -66,9 +66,8 @@ Promise.all(bkTypes).then((values) => {
                 const btn = page.getElementsByClassName('bkBox-button')[0]
                 btn.addEventListener('click', async () => {
                     const input = page.querySelectorAll('input')
-                    const dlRange = [input[0].value, input[1].value]
-                    downloadPerid = input[2].value
-                    console.log('downper', downloadPerid)
+                    const dlRange = [parseInt(input[0].value), parseInt(input[1].value)]
+                    downloadPerid = parseInt(input[2].value)
                     try {
                         hideAllButton()
                         await fetchAllPosts(type, dlRange)
