@@ -68,7 +68,15 @@ function getMedium(post, storage) {
                 const pic = document.createElement('img')
                 pic.className = 'bk-pic'
                 pic.alt = '[图片]'
-                pic.src = item.data.large.url
+                let pic_obj
+                if (imageDefinition === 3) {
+                    pic_obj = item.data.mw2000 || item.data.largest || item.data.original || item.data.large || item.data.bmiddle
+                } else if (imageDefinition === 2) {
+                    pic_obj = item.data.large || item.data.bmiddle
+                } else {
+                    pic_obj = item.data.bmiddle || item.data.thumbnail
+                }
+                pic.src = pic_obj.url
                 return pic.outerHTML
             } else if (item.type === 'video') {
                 const video = document.createElement('a')
@@ -86,7 +94,18 @@ function getMedium(post, storage) {
             }
         })
     } else if (post.pic_ids && post.pic_infos) {
-        return post.pic_ids.map(id => url2path(post.pic_infos[id].large.url, storage)).map((loc) => {
+        return post.pic_ids.map(id => {
+            const tmp_obj = post.pic_infos[id]
+            let pic_obj
+            if (imageDefinition === 3) {
+                pic_obj = tmp_obj.mw2000 || tmp_obj.largest || tmp_obj.original || tmp_obj.large || tmp_obj.bmiddle
+            } else if (imageDefinition === 2) {
+                pic_obj = tmp_obj.large || tmp_obj.bmiddle
+            } else {
+                pic_obj = tmp_obj.bmiddle || tmp_obj.thumbnail
+            }
+            return url2path(pic_obj.url, storage)
+        }).map((loc) => {
             const pic = document.createElement('img')
             pic.className = 'bk-pic'
             pic.alt = '[图片]'
@@ -101,10 +120,11 @@ function getMedium(post, storage) {
 async function parsePost(post, storage) {
     let text = post.isLongText ? await fetchLongText(post.mblogid) : post.text_raw
     text = await transText(text || post.text_raw, post.topic_struct, post.url_struct, storage)
+    const posterAvatar = post.user && imageDefinition === 1 ? post.user.avatar_large && url2path(post.user.avatar_large, storage) : post.user.avatar_hd && url2path(post.user.avatar_hd, storage)
     return {
         posterName: post.user && post.user.screen_name,
         posterUrl: post.user && 'https://weibo.com' + post.user.profile_url,
-        posterAvatar: post.user && post.user.avatar_hd && url2path(post.user.avatar_hd, storage),
+        posterAvatar,
         text,
         postUrl: post.user && post.user.avatar_large && `https://weibo.com/${post.user.idstr}/${post.mblogid}`,
         mblogid: post.mblogid,
