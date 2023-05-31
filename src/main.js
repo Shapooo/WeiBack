@@ -55,10 +55,10 @@ Promise.all(bkTypes).then((values) => {
                 const pageNumIndicator = page.getElementsByClassName('bk-pageNumIndicator')[0]
                 if (type === 'like') {
                     pageNumIndicator.innerHTML = '无法获知点赞总页数'
-                    pageNumIndicator.title = '微博的接口并不返回全部点赞的数量；同样每页二十条'
+                    pageNumIndicator.title = '微博的接口并不返回全部点赞的数量；同样每页大约二十条'
                 } else {
-                    pageNumIndicator.innerHTML = name + '的总页数为 ' + pageAmount
-                    pageNumIndicator.title = '每页二十条博文'
+                    pageNumIndicator.innerHTML = name + '的总页数约为 ' + pageAmount
+                    pageNumIndicator.title = '微博每页返回数目不定中，每页至多二十条博文。如果设置最高页数，则默认下载完全部'
                 }
 
                 const pageEndInput = page.querySelectorAll('input')[1]
@@ -68,6 +68,7 @@ Promise.all(bkTypes).then((values) => {
                 btn.addEventListener('click', async () => {
                     const input = page.querySelectorAll('input')
                     const dlRange = [parseInt(input[0].value), parseInt(input[1].value)]
+                    dlRange = dlRange === pageAmount ? Infinity : dlRange;
                     downloadPerid = parseInt(input[2].value)
                     downloadPerid = downloadPerid > 20 ? 20 : downloadPerid
                     downloadPerid = downloadPerid < 1 ? 1 : downloadPerid
