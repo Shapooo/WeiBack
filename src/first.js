@@ -7,6 +7,8 @@
 // @homepageURL  https://github.com/Shapooo/WeiBack
 // @match        *://*.weibo.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=weibo.com
+// @require      https://cdn.bootcdn.net/ajax/libs/jszip/3.10.1/jszip.min.js
+// @require      https://cdn.bootcdn.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js
 // @grant        none
 // @license      GPL
 // @note         2023-05-12 0.1 完成最基本的功能，能够拉取原始json数据文件进行备份
