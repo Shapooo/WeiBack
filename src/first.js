@@ -26,4 +26,4 @@
 // @note         2023-05-28 0.5 增加分段下载设置功能
 // @note         2023-05-28 0.5 增加图片大小设置功能
 // ==/UserScript==
-"use strict";
+'use strict'

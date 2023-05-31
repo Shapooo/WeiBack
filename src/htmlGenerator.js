@@ -68,15 +68,15 @@ function getMedium(post, storage) {
                 const pic = document.createElement('img')
                 pic.className = 'bk-pic'
                 pic.alt = '[图片]'
-                let pic_obj
+                let picObj
                 if (imageDefinition === 3) {
-                    pic_obj = item.data.mw2000 || item.data.largest || item.data.original || item.data.large || item.data.bmiddle
+                    picObj = item.data.mw2000 || item.data.largest || item.data.original || item.data.large || item.data.bmiddle
                 } else if (imageDefinition === 2) {
-                    pic_obj = item.data.large || item.data.bmiddle
+                    picObj = item.data.large || item.data.bmiddle
                 } else {
-                    pic_obj = item.data.bmiddle || item.data.thumbnail
+                    picObj = item.data.bmiddle || item.data.thumbnail
                 }
-                pic.src = pic_obj.url
+                pic.src = picObj.url
                 return pic.outerHTML
             } else if (item.type === 'video') {
                 const video = document.createElement('a')
@@ -95,16 +95,16 @@ function getMedium(post, storage) {
         })
     } else if (post.pic_ids && post.pic_infos) {
         return post.pic_ids.map(id => {
-            const tmp_obj = post.pic_infos[id]
-            let pic_obj
+            const tmpObj = post.pic_infos[id]
+            let picObj
             if (imageDefinition === 3) {
-                pic_obj = tmp_obj.mw2000 || tmp_obj.largest || tmp_obj.original || tmp_obj.large || tmp_obj.bmiddle
+                picObj = tmpObj.mw2000 || tmpObj.largest || tmpObj.original || tmpObj.large || tmpObj.bmiddle
             } else if (imageDefinition === 2) {
-                pic_obj = tmp_obj.large || tmp_obj.bmiddle
+                picObj = tmpObj.large || tmpObj.bmiddle
             } else {
-                pic_obj = tmp_obj.bmiddle || tmp_obj.thumbnail
+                picObj = tmpObj.bmiddle || tmpObj.thumbnail
             }
-            return url2path(pic_obj.url, storage)
+            return url2path(picObj.url, storage)
         }).map((loc) => {
             const pic = document.createElement('img')
             pic.className = 'bk-pic'
