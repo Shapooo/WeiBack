@@ -95,6 +95,8 @@ WeiBack 是一个帮助微博用户备份自己数据的 [油猴 (Tampermonkey)]
 
 2023-05-28 0.5 增加图片大小设置功能
 
+2023-06-11 0.6 修复无法下载全部微博的问题
+
 ## Bugs/Requests
 
 通过 [github issue tracker](https://github.com/Shapooo/WeiBack/issues) 提交问题和需求，或通过  [Greasyfork](https://greasyfork.org/zh-CN/scripts/466100-%E5%BE%AE%E5%8D%9A%E5%A4%87%E4%BB%BD/feedback) 进行反馈，优先选择github。
