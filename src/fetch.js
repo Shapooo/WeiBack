@@ -15,7 +15,7 @@ async function fetchPostMeta(uid = 0, page = 1, type = 'myblog') {
     return data
 }
 
-async function fetchAllPosts(type = 'myblog', range) {
+async function fetchAllPosts(type = 'myblog', range, uid) {
     console.log(`fetching ${type} post ${range}`)
 
     const storage = {
@@ -26,7 +26,7 @@ async function fetchAllPosts(type = 'myblog', range) {
     }
     await fetchEmoticon()
 
-    const uid = globalConfig.uid
+    uid = uid ? uid : globalConfig.uid
     downloadPerid = downloadPerid || 10
     let allPageData = []
     let noMore = false
