@@ -1,3 +1,4 @@
+export { LRUCache }
 function LRUCache(capacity) {
     this.capacity = capacity
     this.next = new Uint16Array(capacity)

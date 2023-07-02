@@ -1,3 +1,7 @@
+import { generateHTMLPage, getFilename } from './htmlGenerator.js'
+import { LRUCache } from './lru-cache.js'
+export { fetchAllPosts }
+
 async function fetchPostMeta(uid = 0, page = 1, type = 'myblog') {
     let api = `${STATUSES_MY_MICRO_BLOG_API}?uid=${uid}&page=${page}&feature=0`
 
