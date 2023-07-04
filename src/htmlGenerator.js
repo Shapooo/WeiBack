@@ -122,7 +122,7 @@ function getMedium(post, storage) {
 async function parsePost(post, storage) {
   let text = post.isLongText ? await fetchLongText(post.mblogid) : post.text_raw;
   text = await transText(text || post.text_raw, post.topic_struct, post.url_struct, storage);
-  const posterAvatar = post.user && imageDefinition === 1 ? post.user.avatar_large && url2path(post.user.avatar_large, storage) : post.user.avatar_hd && url2path(post.user.avatar_hd, storage);
+  const posterAvatar = post.user && post.user.id && imageDefinition === 1 ? post.user.avatar_large && url2path(post.user.avatar_large, storage) : post.user.avatar_hd && url2path(post.user.avatar_hd, storage);
   return {
     posterName: post.user && post.user.screen_name,
     posterUrl: post.user && 'https://weibo.com' + post.user.profile_url,
