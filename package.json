@@ -1,7 +1,7 @@
 {
   "name": "weiback",
   "private": true,
-  "version": "v0.8",
+  "version": "0.8",
   "type": "module",
   "scripts": {
     "dev": "vite",
