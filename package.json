@@ -1,7 +1,7 @@
 {
   "name": "weiback",
   "private": true,
-  "version": "0.0.0",
+  "version": "v0.8",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,9 +10,18 @@
   },
   "devDependencies": {
     "@jihchi/vite-plugin-rescript": "^5.3.0",
+    "eslint": ">=5.16.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
+    "eslint-plugin-promise": "^6.0.0",
     "rescript": "^10.1.4",
     "vite": "^4.3.9",
     "vite-plugin-monkey": "^3.2.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@glennsl/rescript-fetch": "^0.2.0",
+    "@rescript/core": "^0.3.1",
+    "rescript-webapi": "^0.8.0"
+  }
 }

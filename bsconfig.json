@@ -8,6 +8,11 @@
     "module": "es6",
     "in-source": true
   },
-  "suffix": ".bs.js"
+  "suffix": ".bs.js",
+  "bs-dependencies": [
+    "@glennsl/rescript-fetch",
+    "@rescript/core",
+    "rescript-webapi"
+  ]
 }
 
