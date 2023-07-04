@@ -1,4 +1,5 @@
 import {fetchAllPosts} from './fetch.js';
+export {showTip};
 
 const bkBoxStyle = '.bkBox{position:fixed;border-radius:5px;background:#fff;top:80px;right:20px;z-index:100000;padding:10px 15px;text-align:center;border:1px solid #a7a6a6}.bkBox-title{font-size:20px;color:#ff8200;margin:8px 0;font-weight:400;border:1px solid transparent;border-bottom-color:#a7a6a6}.bkBox-button{border-radius:2.25rem;display:block;background:#ffd3a3;padding:5px 8px;color:#fff;text-align:center;cursor:pointer;margin:16px auto 7px;border:0;font:white}.bkBox-button:hover{background:#ff8200}.box,.nav{width:320px;margin:auto;display:flex}.nav{height:30px;background-color:#fff;border:1px gray}.box{overflow:hidden}.bk-naviItem{color:#000;height:30px;width:80px;margin:auto;border:8px #000;float:left}.bk-naviItem,.bk-naviItem:hover{text-decoration:none}.bk-navi-inner{border-radius:8px;height:30px}.bk-navi-inner:hover{background-color:#f2f0ef}.bk-pageNumIndicator{margin:16px}.bk-settingPage{border-radius:5px;width:320px;height:190px;background-color:#f2f0ef;flex-shrink:0}.bk-input{border-radius:1em;border:2px solid #ffd3a3;height:20px;width:50px;text-align:center}.bk-input:hover{border:2px solid #ff8200}.bk-textinput{width:120px}.bkBox-tip{height:100px;width:320px;display:flex;align-items:center;justify-content:center}';
 
@@ -10,17 +11,14 @@ const TITLE_PIC = '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKkAA
 const BKBOX_TEMP = `<div class='bkBox-title'>${TITLE_PIC}</div><nav><div class='navi'></div></nav><section><div class='box'></div></section>`;
 
 const domain = window.location.host;
-const STATUSES_CONFIG_API = `https://${domain}/ajax/statuses/config`;
-const STATUSES_MY_MICRO_BLOG_API = `https://${domain}/ajax/statuses/mymblog`;
-const STATUSES_LONGTEXT_API = `https://${domain}/ajax/statuses/longtext`;
-const STATUSES_LIKE_LIST_API = `https://${domain}/ajax/statuses/likelist`;
-const FAVORITES_ALL_FAV_API = `https://${domain}/ajax/favorites/all_fav`;
 const FAVORITES_TAGS_API = `https://${domain}/ajax/favorites/tags?page=1&is_show_total=1`;
 const PROFILE_INFO_API = `https://${domain}/ajax/profile/info`;
 
 const globalConfig = {
   uid: $CONFIG.uid,
 };
+
+globalThis.globalConfig = globalConfig;
 
 const backType = (type, name) => {
   return (async () => {
@@ -41,8 +39,8 @@ bkBox.appendChild(bkBoxStyleSheet);
 const bkBoxTip = document.createElement('div');
 bkBoxTip.className = 'bkBox-tip';
 bkBox.appendChild(bkBoxTip);
-let downloadPerid = 10;
-let imageDefinition = 3;
+globalThis.downloadPeriod = 10;
+globalThis.imageDefinition = 3;
 
 const bkTypes = [backType('fav', '我的收藏'), backType('myblog', '我的发布'), backType('like', '我的点赞'), backType('others', '他人发布')];
 Promise.all(bkTypes).then((values) => {
@@ -76,12 +74,12 @@ Promise.all(bkTypes).then((values) => {
           let dlRange = [parseInt(range[0].value), parseInt(range[1].value)];
           dlRange = dlRange === pageAmount ? Infinity : dlRange;
           const period = page.querySelector('.period');
-          downloadPerid = parseInt(period.value);
-          downloadPerid = downloadPerid > 20 ? 20 : downloadPerid;
-          downloadPerid = downloadPerid < 1 ? 1 : downloadPerid;
-          imageDefinition = parseInt(page.querySelector('.definition').value);
-          imageDefinition = imageDefinition > 3 ? 3 : imageDefinition;
-          imageDefinition = imageDefinition < 1 ? 1 : imageDefinition;
+          globalThis.downloadPeriod = parseInt(period.value);
+          globalThis.downloadPeriod = globalThis.downloadPeriod > 20 ? 20 : globalThis.downloadPeriod;
+          globalThis.downloadPeriod = globalThis.downloadPeriod < 1 ? 1 : globalThis.downloadPeriod;
+          globalThis.imageDefinition = parseInt(page.querySelector('.definition').value);
+          globalThis.imageDefinition = globalThis.imageDefinition > 3 ? 3 : globalThis.imageDefinition;
+          globalThis.imageDefinition = globalThis.imageDefinition < 1 ? 1 : globalThis.imageDefinition;
           try {
             hideAllButton();
             if (type === 'others') {
