@@ -92,7 +92,7 @@ Promise.all(bkTypes).then((values) => {
             }
             showAllButton();
           } catch (err) {
-            showTip(`程序崩了，原因: {err}`);
+            showTip(`程序崩了，原因: ${err}`);
             console.error(err);
           }
         });
