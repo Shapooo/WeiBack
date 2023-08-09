@@ -122,7 +122,7 @@ function getMedium(post, storage) {
 }
 
 async function parsePost(post, storage) {
-  let text = post.isLongText ? await fetchLongText(post.mblogid) : post.text_raw;
+  let text = (post.isLongText && await fetchLongText(post.mblogid)) || post.text_raw;
   text = await transText(text || post.text_raw, post.topic_struct, post.url_struct, storage);
   let posterAvatar;
   if (post.user && post.user.id) {
@@ -155,8 +155,12 @@ async function parsePost(post, storage) {
 async function fetchLongText(mblogid) {
   const api = `${STATUSES_LONGTEXT_API}?id=${mblogid}`;
   const res = await fetch(api);
-  const longText = (await res.json()).data.longTextContent;
-  return longText;
+  if (res.ok) {
+    const longText = (await res.json()).data.longTextContent;
+    return longText;
+  } else {
+    return '';
+  }
 }
 
 async function transText(text, topicStruct, urlStruct, storage) {
