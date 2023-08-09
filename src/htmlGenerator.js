@@ -124,7 +124,21 @@ function getMedium(post, storage) {
 async function parsePost(post, storage) {
   let text = post.isLongText ? await fetchLongText(post.mblogid) : post.text_raw;
   text = await transText(text || post.text_raw, post.topic_struct, post.url_struct, storage);
-  const posterAvatar = post.user && post.user.id && imageDefinition === 1 ? post.user.avatar_large && url2path(post.user.avatar_large, storage) : post.user.avatar_hd && url2path(post.user.avatar_hd, storage);
+  let posterAvatar;
+  if (post.user && post.user.id) {
+    let avatarUrl;
+    switch (imageDefinition) {
+      case 1:
+        avatarUrl = post.user.profile_image_url || post.user.avatar_large || post.user.avatar_hd;
+        break;
+      case 2:
+        avatarUrl = post.user.avatar_large || post.user.avatar_hd || post.user.profile_image_url;
+        break;
+      default:
+        avatarUrl = post.user.avatar_hd || post.user.avatar_large || post.user.profile_image_url;
+    }
+    posterAvatar = avatarUrl && url2path(avatarUrl, storage);
+  }
   return {
     posterName: post.user && post.user.screen_name,
     posterUrl: post.user && 'https://weibo.com' + post.user.profile_url,
