@@ -1,4 +1,4 @@
-export {generateHTMLPage, getFilename};
+export { generateHTMLPage, getFilename };
 
 const domain = window.location.host;
 const STATUSES_LONGTEXT_API = `https://${domain}/ajax/statuses/longtext`;
@@ -156,8 +156,8 @@ async function fetchLongText(mblogid) {
   const api = `${STATUSES_LONGTEXT_API}?id=${mblogid}`;
   const res = await fetch(api);
   if (res.ok) {
-    const longText = (await res.json()).data.longTextContent;
-    return longText;
+    const jsn = await res.json();
+    return jsn.data && jsn.data.longTextContent || '';
   } else {
     return '';
   }
@@ -175,44 +175,44 @@ async function transText(text, topicStruct, urlStruct, storage) {
   const emailExpr = /[A-Za-z0-9]+([_.][A-Za-z0-9]+)*@([A-Za-z0-9-]+\.)+[A-Za-z]{2,6}/g; // mail addr
   const topicExpr = /#([^#]+)#/g; // topic
   const u = [];
-  const ret = text && (text = text.replace(emailExpr, function(t) { // mail addr
+  const ret = text && (text = text.replace(emailExpr, function (t) { // mail addr
     if (t.match(atExpr)) {
       const e = t.match(atExpr);
       u.push(e && e[0]);
     }
     return t;
   }),
-  text = text.replace(r, function(e) {
-    if (e) {
-      const o = e.slice(0, 1);
-      return e === '\n' ? transBr() : o === 'h' || urlStruct ? transUrl(e, urlStruct) : e;
-    }
-  }),
-  text = text.replace(atExpr, function(e) {
-    return u.indexOf(e) !== -1 ? e : transUser(e);
-  }),
-  text = text.replace(topicExpr, function(e) {
-    const a = e.slice(0, 1);
-    return a === '#' && '#&#' && isSuperTopic(e, urlStruct) !== e ? transTopic(e, topicStruct) : e;
-  }),
-  console.assert(globalThis.globalConfig.emoticon),
-  text = text.replace(emojiExpr, function(e) {
-    return transEmoji(e, storage);
-  }),
-  text);
+    text = text.replace(r, function (e) {
+      if (e) {
+        const o = e.slice(0, 1);
+        return e === '\n' ? transBr() : o === 'h' || urlStruct ? transUrl(e, urlStruct) : e;
+      }
+    }),
+    text = text.replace(atExpr, function (e) {
+      return u.indexOf(e) !== -1 ? e : transUser(e);
+    }),
+    text = text.replace(topicExpr, function (e) {
+      const a = e.slice(0, 1);
+      return a === '#' && '#&#' && isSuperTopic(e, urlStruct) !== e ? transTopic(e, topicStruct) : e;
+    }),
+    console.assert(globalThis.globalConfig.emoticon),
+    text = text.replace(emojiExpr, function (e) {
+      return transEmoji(e, storage);
+    }),
+    text);
   return ret;
 }
 
 function isSuperTopic(input, urlStruct) {
   input = input !== undefined ? input : '';
   urlStruct = urlStruct !== undefined ? urlStruct : [];
-  return (input && urlStruct.length) && urlStruct.find(function(e) {
+  return (input && urlStruct.length) && urlStruct.find(function (e) {
     return e.short_url === input;
   });
 }
 
 function transUrl(input, urlStruct) {
-  const urlObj = urlStruct && urlStruct.find(function(e) {
+  const urlObj = urlStruct && urlStruct.find(function (e) {
     return e.short_url === input;
   });
   const urlExpr = /(http|https):\/\/([\w.]+\/?)\S*/;
@@ -234,7 +234,7 @@ function transUrl(input, urlStruct) {
 
 function transTopic(t, topicStruct) {
   const i = t && t.slice(1, -1);
-  const a = topicStruct && topicStruct.find(function(t) {
+  const a = topicStruct && topicStruct.find(function (t) {
     return t.topic_title === i && t.is_invalid === 1;
   });
   if (a) {
