@@ -117,6 +117,12 @@ WeiBack 是一个帮助微博用户备份自己数据的 [油猴 (Tampermonkey)]
 
 2023-07-04 0.8 用上了前端的工具链yarn、vite
 
+2023-08-09 0.8.1 修复 avatar_hd undefined 的问题
+
+2023-08-09 0.8.2 绕过微博返回 isLongText 字段错误的问题
+
+2023-09-22 0.9 添加是否下载图片选项
+
 ## Bugs/Requests
 
 通过 [github issue tracker](https://github.com/Shapooo/WeiBack/issues) 提交问题和需求，或通过  [Greasyfork](https://greasyfork.org/zh-CN/scripts/466100-%E5%BE%AE%E5%8D%9A%E5%A4%87%E4%BB%BD/feedback) 进行反馈，优先选择github。
