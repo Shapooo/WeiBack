@@ -2,7 +2,6 @@ export { generateHTMLPage, getFilename };
 
 const domain = window.location.host;
 const STATUSES_LONGTEXT_API = `https://${domain}/ajax/statuses/longtext`;
-const imageDefinition = globalThis.imageDefinition;
 
 async function generateHTMLPage(posts, storage) {
   return Promise.all(posts.map((post) => generateHTMLPost(post, storage))).then((posts) => posts.join(''));
@@ -65,6 +64,7 @@ async function generateHTMLPost(post, storage) {
 }
 
 function getMedium(post, storage) {
+  const imageDefinition = globalThis.imageDefinition
   if (post.mix_media_info) {
     return post.mix_media_info.items.map((item) => {
       const data = item.data;
