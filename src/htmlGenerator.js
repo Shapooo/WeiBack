@@ -146,7 +146,7 @@ async function parsePost(post, storage) {
     text,
     postUrl: post.user && post.user.id && `https://weibo.com/${post.user.idstr}/${post.mblogid}`,
     mblogid: post.mblogid,
-    createdAt: post.created_at,
+    createdAt: new Date(post.created_at).toLocaleString('zh-CN'),
     regionName: post.region_name ? post.region_name : '',
     medium: getMedium(post, storage),
   };

@@ -123,6 +123,8 @@ WeiBack 是一个帮助微博用户备份自己数据的 [油猴 (Tampermonkey)]
 
 2023-10-03 0.9.1 修复图片分辨率不起作用的问题
 
+2023-10-03 0.9.2 微博日期改用中国常用格式
+
 ## Bugs/Requests
 
 通过 [github issue tracker](https://github.com/Shapooo/WeiBack/issues) 提交问题和需求，或通过  [Greasyfork](https://greasyfork.org/zh-CN/scripts/466100-%E5%BE%AE%E5%8D%9A%E5%A4%87%E4%BB%BD/feedback) 进行反馈，优先选择github。
