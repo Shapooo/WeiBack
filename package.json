@@ -16,7 +16,7 @@
     "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
     "eslint-plugin-promise": "^6.0.0",
     "rescript": "^10.1.4",
-    "vite": "^4.3.9",
+    "vite": "^5.1.4",
     "vite-plugin-monkey": "^3.2.2"
   },
   "dependencies": {

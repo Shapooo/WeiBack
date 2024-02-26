@@ -1,7 +1,7 @@
-import {generateHTMLPage, getFilename} from './htmlGenerator.js';
-import {LRUCache} from './lru-cache.js';
-import {showTip} from './main.js';
-export {fetchAllPosts};
+import { generateHTMLPage, getFilename } from './htmlGenerator.js';
+import { LRUCache } from './lru-cache.js';
+import { showTip } from './main.js';
+export { fetchAllPosts };
 
 const domain = window.location.host;
 const downloadPic = true;
@@ -46,7 +46,6 @@ async function fetchAllPosts(type = 'myblog', range, downloadPic, uid) {
   let index = 0;
   const zip = new JSZip();
   const name = storage.taskName;
-  const rootFolder = zip.folder(name);
   const resources = new Map();
   for (let page = range[0]; page <= range[1]; page++) {
     console.log('scan', 'page', page);
@@ -64,7 +63,7 @@ async function fetchAllPosts(type = 'myblog', range, downloadPic, uid) {
       });
       console.log('retry', i);
       showTip(
-          `[重试]备份第 ${index} 页，错误内容： ${JSON.stringify(pageData)}`,
+        `[重试]备份第 ${index} 页，错误内容： ${JSON.stringify(pageData)}`,
       );
     }
 
@@ -93,11 +92,20 @@ async function fetchAllPosts(type = 'myblog', range, downloadPic, uid) {
       const doc = (new DOMParser()).parseFromString(HTML_GEN_TEMP, 'text/html');
       doc.body.innerHTML = allPageData.join('');
       allPageData = [];
+      const rootFolder = zip.folder(taskName);
       rootFolder.file(taskName + '.html', doc.documentElement.outerHTML);
       const resourcesFolder = rootFolder.folder(taskName + '_files');
       resources.forEach((blob, url) => {
-        resourcesFolder.file(getFilename(url), blob, {base64: true});
+        resourcesFolder.file(getFilename(url), blob, { base64: true });
       });
+
+      zip.generateAsync({ type: 'blob' }).then(function (content) {
+        saveAs(content, taskName + '.zip');
+      }).catch((err) => {
+        console.error(err);
+      });
+
+      zip.remove(taskName);
       resources.clear();
     }
 
@@ -108,12 +116,6 @@ async function fetchAllPosts(type = 'myblog', range, downloadPic, uid) {
   }
 
   showTip('数据拉取完成，等待下载到本地');
-
-  zip.generateAsync({type: 'blob'}).then(function(content) {
-    saveAs(content, name + '.zip');
-  }).catch((err) => {
-    console.error(err);
-  });
 
   console.log('all done');
   showTip('完成，可以进行其它操作');
