@@ -92,9 +92,8 @@ async function fetchAllPosts(type = 'myblog', range, downloadPic, uid) {
       const doc = (new DOMParser()).parseFromString(HTML_GEN_TEMP, 'text/html');
       doc.body.innerHTML = allPageData.join('');
       allPageData = [];
-      const rootFolder = zip.folder(taskName);
-      rootFolder.file(taskName + '.html', doc.documentElement.outerHTML);
-      const resourcesFolder = rootFolder.folder(taskName + '_files');
+      zip.file(taskName + '.html', doc.documentElement.outerHTML);
+      const resourcesFolder = zip.folder(taskName + '_files');
       resources.forEach((blob, url) => {
         resourcesFolder.file(getFilename(url), blob, { base64: true });
       });
