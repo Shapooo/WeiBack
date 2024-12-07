@@ -107,13 +107,13 @@ Promise.all(bkTypes).then((values) => {
 
 function hideAllButton() {
   const buttons = document.getElementsByClassName('bkBox-button');
-  buttons.forEach((btn) => {
+  Array.from(buttons).forEach((btn) => {
     btn.style.display = 'none';
   });
 }
 function showAllButton() {
   const buttons = document.getElementsByClassName('bkBox-button');
-  buttons.forEach((btn) => {
+  Array.from(buttons).forEach((btn) => {
     btn.style.display = 'block';
   });
 }
