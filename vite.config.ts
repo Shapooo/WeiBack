@@ -15,8 +15,8 @@ export default defineConfig({
             match: [
                 '*://*.weibo.com/*',
             ],
-            require: ['https://cdn.bootcdn.net/ajax/libs/jszip/3.10.1/jszip.min.js',
-                'https://cdn.bootcdn.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js'],
+            require: ['https://cdn.jsdelivr.net/npm/jszip@3.10/dist/jszip.min.js',
+                'https://cdn.jsdelivr.net/npm/file-saver@2.0/dist/FileSaver.min.js'],
             icon: 'https://www.google.com/s2/favicons?sz=64&domain=weibo.com',
             grant: 'none',
             license: 'GPL',
